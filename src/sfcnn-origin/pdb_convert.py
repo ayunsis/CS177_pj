@@ -17,17 +17,28 @@ def get_protein_chains(pdb_path):
     parser = PDBParser(QUIET=True)
     structure = parser.get_structure("protein", pdb_path)
     chains = {}
-    seen_sequences = set()
+    sequence_counts = {}
+    sequence_to_chain = {}
     for model in structure:
         for chain in model:
             seq = ""
             for residue in chain:
                 if residue.get_id()[0] == " ":
                     seq += seq1(residue.get_resname())
-            if seq and seq not in seen_sequences:
-                chains[chain.id] = seq
-                seen_sequences.add(seq)
+            if seq:
+                if seq not in sequence_counts:
+                    sequence_counts[seq] = 1
+                    sequence_to_chain[seq] = chain.id
+                else:
+                    sequence_counts[seq] += 1
         break  # Only first model
+
+    for seq, count in sequence_counts.items():
+        chain_info = {"sequence": seq}
+        if count > 1:
+            chain_info["copy"] = count
+        chains[sequence_to_chain[seq]] = chain_info
+
     return chains
 
 def process_coreset(coreset_dir):
