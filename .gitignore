@@ -4,3 +4,4 @@ __pycache__
 *.pdb
 *.mol2
 *.pkl
+*.cif

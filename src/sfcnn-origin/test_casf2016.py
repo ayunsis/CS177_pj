@@ -6,6 +6,7 @@ import os
 
 model = predict.build_model()
 core_dirs = glob(os.path.join('data\coreset','*'))
+print(len(core_dirs))
 core_id = [os.path.split(i)[-1] for i in core_dirs]
 f = open('src\sfcnn-origin\out/output.csv','w')
 f.write('#code\tscore\n')
