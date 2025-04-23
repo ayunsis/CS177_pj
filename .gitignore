@@ -1,2 +1,6 @@
 coreset
 refined-set
+__pycache__
+*.pdb
+*.mol2
+*.pkl
