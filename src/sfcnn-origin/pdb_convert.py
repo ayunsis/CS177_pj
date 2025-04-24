@@ -10,6 +10,7 @@ OUTPUT_JSON = 'coreset_smiles_chains.json'
 def get_ligand_smiles(mol2_path):
     mol = Chem.MolFromMol2File(mol2_path)
     if mol:
+        Chem.SanitizeMol(mol)
         return Chem.MolToSmiles(mol)
     return None
 
@@ -38,6 +39,8 @@ def get_protein_chains(pdb_path):
         if count > 1:
             chain_info["copy"] = count
         chains[sequence_to_chain[seq]] = chain_info
+        if count > 6:
+            print(f"Protein file with >5 copies: {os.path.basename(pdb_path)}")
 
     return chains
 
