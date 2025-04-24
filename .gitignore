@@ -5,3 +5,4 @@ __pycache__
 *.mol2
 *.pkl
 *.cif
+*.zip
