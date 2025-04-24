@@ -1,7 +1,7 @@
 import json
 
 # Load the JSON file
-json_path = r'd:\Bertram Rowen\texts\code\CS177\CS177_pj\src\sfcnn\targets\target3.json'
+json_path = r'src\sfcnn\targets\target3.json'
 with open(json_path, 'r', encoding='utf-8') as f:
     data = json.load(f)
 

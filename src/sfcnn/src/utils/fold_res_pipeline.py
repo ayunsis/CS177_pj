@@ -7,8 +7,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 # Paths (adjust as needed)
-index_folder_root = r'd:\Bertram Rowen\texts\code\CS177\CS177_pj\src\sfcnn\chai_results'
-target_json = r'd:\Bertram Rowen\texts\code\CS177\CS177_pj\src\sfcnn\targets\target1.json'
+index_folder_root = r'data\chai_results_zip\target1'
+target_json = r'src\sfcnn\targets\target1.json'
+output_root = r'data\chai_results_cif'
 
 # Load index-to-protein mapping
 with open(target_json, encoding='utf-8') as f:
@@ -56,7 +57,7 @@ for fname in os.listdir(index_folder_root):
             print(f"No pred.rank_0.cif file found in {zip_path}")
             continue
         cif_file = cif_files[0]
-        dest_folder = os.path.join(index_folder_root, protein_name)
+        dest_folder = os.path.join(output_root, protein_name)
         os.makedirs(dest_folder, exist_ok=True)
         dest_cif_path = os.path.join(dest_folder, f"{protein_name}.cif")
         # Decode and save .cif file
