@@ -4,5 +4,7 @@ __pycache__
 *.pdb
 *.mol2
 *.pkl
+*.h5
 *.cif
 *.zip
+data
