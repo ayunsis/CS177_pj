@@ -140,9 +140,18 @@ criterion = nn.MSELoss()
 
 # Training loop
 best_val_loss = float('inf')
-os.makedirs('cnnmodel', exist_ok=True)
+os.makedirs('src/sfcnn/src/train_results/cnnmodel', exist_ok=True)
 
-for epoch in tqdm(range(1, 201), desc="Epochs"):
+train_loss_history = []
+val_loss_history = []
+val_mae_history = []
+
+TRAIN_EPOCHS = 1
+
+for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
+    train_losses = []
+    val_losses = []
+    val_maes = []
     model.train()
     train_loss = 0
     for xb, yb in tqdm(train_loader, desc=f"Train {epoch:03d}", leave=False):
@@ -159,6 +168,8 @@ for epoch in tqdm(range(1, 201), desc="Epochs"):
         optimizer.step()
         train_loss += loss.item() * xb.size(0)
     train_loss /= len(train_loader.dataset)
+    train_losses.append(train_loss)
+    train_loss_history.append(train_loss)
 
     # Validation
     model.eval()
@@ -177,15 +188,23 @@ for epoch in tqdm(range(1, 201), desc="Epochs"):
             val_mae += torch.abs(pred - yb).sum().item()
     val_loss /= len(val_loader.dataset)
     val_mae /= len(val_loader.dataset)
+    val_losses.append(val_loss)
+    val_maes.append(val_mae)
+    val_loss_history.append(val_loss)
+    val_mae_history.append(val_mae)
 
-    print(f"Epoch {epoch:03d}: train_loss={train_loss:.4f} val_loss={val_loss:.4f} val_mae={val_mae:.4f}")
+    # print(f"Epoch {epoch:03d}: train_loss={train_loss:.4f} val_loss={val_loss:.4f} val_mae={val_mae:.4f}")
 
     # Save best model
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        torch.save(model.state_dict(), f'cnnmodel/weights_{epoch:03d}-{val_loss:.4f}.pt')
+    torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{val_loss:.4f}.pt')
 
-# Test evaluation
+
+np.save('src/sfcnn/src/train_results/train_loss_history.npy', np.array(train_loss_history))
+np.save('src/sfcnn/src/train_results/val_loss_history.npy', np.array(val_loss_history))
+np.save('src/sfcnn/src/train_results/val_mae_history.npy', np.array(val_mae_history))
+
 model.eval()
 test_loss = 0
 test_mae = 0
