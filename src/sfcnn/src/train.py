@@ -135,7 +135,7 @@ class CNN3D(nn.Module):
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('current device: ', device)
 model = CNN3D(dropout=args.dropout).to(device)
-optimizer = optim.RMSprop(model.parameters(), lr=args.lr)
+optimizer = optim.RMSprop(model.parameters(), lr=args.lr, weight_decay=0.01)
 criterion = nn.MSELoss()
 
 # Training loop
@@ -146,7 +146,7 @@ train_loss_history = []
 val_loss_history = []
 val_mae_history = []
 
-TRAIN_EPOCHS = 1
+TRAIN_EPOCHS = 200
 
 for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
     train_losses = []
@@ -198,7 +198,7 @@ for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
     # Save best model
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-    torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{val_loss:.4f}.pt')
+        torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{val_loss:.4f}.pt')
 
 
 np.save('src/sfcnn/src/train_results/train_loss_history.npy', np.array(train_loss_history))
