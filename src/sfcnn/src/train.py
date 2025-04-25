@@ -6,8 +6,7 @@ import numpy as np
 import os
 import h5py
 import argparse
-import h5py
-import h5py
+from tqdm import tqdm  # <-- Add tqdm import
 
 with h5py.File('data/train_hdf5/train_grids.h5', 'r') as f:
     print("train_grids:", f['train_grids'].shape)
@@ -134,6 +133,7 @@ class CNN3D(nn.Module):
         return x
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print('current device: ', device)
 model = CNN3D(dropout=args.dropout).to(device)
 optimizer = optim.RMSprop(model.parameters(), lr=args.lr)
 criterion = nn.MSELoss()
@@ -141,10 +141,11 @@ criterion = nn.MSELoss()
 # Training loop
 best_val_loss = float('inf')
 os.makedirs('cnnmodel', exist_ok=True)
-for epoch in range(1, 201):
+
+for epoch in tqdm(range(1, 201), desc="Epochs"):
     model.train()
     train_loss = 0
-    for xb, yb in train_loader:
+    for xb, yb in tqdm(train_loader, desc=f"Train {epoch:03d}", leave=False):
         xb, yb = xb.to(device), yb.to(device)  # xb: [batch, 10, 20, 20, 20, 28], yb: [batch, 1]
         b, s, d1, d2, d3, c = xb.shape
 
@@ -158,14 +159,13 @@ for epoch in range(1, 201):
         optimizer.step()
         train_loss += loss.item() * xb.size(0)
     train_loss /= len(train_loader.dataset)
-    print('train finished')
 
     # Validation
     model.eval()
     val_loss = 0
     val_mae = 0
     with torch.no_grad():
-        for xb, yb in val_loader:
+        for xb, yb in tqdm(val_loader, desc=f"Val {epoch:03d}", leave=False):
             xb, yb = xb.to(device), yb.to(device)  # xb: [batch, 10, 20, 20, 20, 28], yb: [batch, 1]
             b, s, d1, d2, d3, c = xb.shape
 
@@ -190,7 +190,7 @@ model.eval()
 test_loss = 0
 test_mae = 0
 with torch.no_grad():
-    for xb, yb in test_loader:
+    for xb, yb in tqdm(test_loader, desc="Testing", leave=False):
         xb, yb = xb.to(device), yb.to(device)  # xb: [batch, 10, 20, 20, 20, 28], yb: [batch, 1]
         b, s, d1, d2, d3, c = xb.shape
     
