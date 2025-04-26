@@ -160,11 +160,8 @@ for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
     model.train()
     train_loss = 0
     for xb, yb in tqdm(train_loader, desc=f"Train {epoch:03d}", leave=False):
-        xb, yb = xb.to(device), yb.to(device)  # xb: [batch, 10, 20, 20, 20, 28], yb: [batch, 1]
-        b, s, d1, d2, d3, c = xb.shape
-
-        xb = xb.reshape(b * s, d1, d2, d3, c)  # [batch*10, 20, 20, 20, 28]
-        yb = yb.repeat(1, s).reshape(b * s, 1)
+        xb, yb = xb.to(device), yb.to(device)  
+        b, d1, d2, d3, c = xb.shape
 
         optimizer.zero_grad()
         pred = model(xb)
@@ -182,11 +179,8 @@ for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
     val_mae = 0
     with torch.no_grad():
         for xb, yb in tqdm(val_loader, desc=f"Val {epoch:03d}", leave=False):
-            xb, yb = xb.to(device), yb.to(device)  # xb: [batch, 10, 20, 20, 20, 28], yb: [batch, 1]
-            b, s, d1, d2, d3, c = xb.shape
-
-            xb = xb.reshape(b * s, d1, d2, d3, c)  # [batch*10, 20, 20, 20, 28]
-            yb = yb.repeat(1, s).reshape(b * s, 1)
+            xb, yb = xb.to(device), yb.to(device)  
+            b, d1, d2, d3, c = xb.shape
             pred = model(xb)
             loss = criterion(pred, yb)
             val_loss += loss.item() * xb.size(0)
@@ -215,11 +209,8 @@ test_loss = 0
 test_mae = 0
 with torch.no_grad():
     for xb, yb in tqdm(test_loader, desc="Testing", leave=False):
-        xb, yb = xb.to(device), yb.to(device)  # xb: [batch, 10, 20, 20, 20, 28], yb: [batch, 1]
-        b, s, d1, d2, d3, c = xb.shape
-    
-        xb = xb.reshape(b * s, d1, d2, d3, c)  # [batch*10, 20, 20, 20, 28]
-        yb = yb.repeat(1, s).reshape(b * s, 1)
+        xb, yb = xb.to(device), yb.to(device)  
+        b, d1, d2, d3, c = xb.shape
         pred = model(xb)
         test_loss += criterion(pred, yb).item() * xb.size(0)
         test_mae += torch.abs(pred - yb).sum().item()
