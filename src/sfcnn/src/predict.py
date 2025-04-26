@@ -107,13 +107,20 @@ class CNN3D(nn.Module):
         x = self.fc(x)
         return x
 
-def predict(protein, ligand, model, device):
+def predict(protein, ligand, model, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')):
     grid = get_grid(protein, ligand)  # shape: (1, 20, 20, 20, 28)
     grid_tensor = torch.tensor(grid, dtype=torch.float32).to(device)
     with torch.no_grad():
         output = model(grid_tensor)
         result = output.item() * 15  # match normalization in training
     return result
+
+def build_model(weights_path, dropout=0.5, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')):
+    model = CNN3D(dropout=dropout)
+    model.load_state_dict(torch.load(weights_path, map_location=device))
+    model.to(device)
+    model.eval()
+    return model
 
 def main():
     parser = argparse.ArgumentParser(description='PyTorch Predict the affinity of protein and ligand!')

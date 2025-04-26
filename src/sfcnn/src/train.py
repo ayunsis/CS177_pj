@@ -50,7 +50,7 @@ TRAIN_LABEL = r'data/train_hdf5/train_label.h5'
 CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
 CORE_LABEL = r'data/test_hdf5/core_label.h5'
 
-def get_indices(total, val_start=4100, seed=1234):
+def get_indices(total, val_start=41000, seed=1234):
     all_idx = np.arange(total)
     np.random.seed(seed)
     np.random.shuffle(all_idx)
@@ -135,7 +135,12 @@ class CNN3D(nn.Module):
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('current device: ', device)
 model = CNN3D(dropout=args.dropout).to(device)
-optimizer = optim.RMSprop(model.parameters(), lr=args.lr, weight_decay=0.01)
+last_linear = model.fc[-1]
+params = [
+    {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
+    {'params': last_linear.parameters(), 'weight_decay': 0.01} 
+]
+optimizer = optim.RMSprop(model.parameters(), lr=args.lr)
 criterion = nn.MSELoss()
 
 # Training loop
