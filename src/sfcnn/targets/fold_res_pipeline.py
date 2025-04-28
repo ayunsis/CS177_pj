@@ -7,8 +7,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 # Paths (adjust as needed)
-index_folder_root = r'd:\Bertram Rowen\texts\code\CS177\CS177_pj\src\sfcnn\chai_results'
-target_json = r'd:\Bertram Rowen\texts\code\CS177\CS177_pj\src\sfcnn\targets\target1.json'
+index_folder_root = r'C:\Users\18660\Desktop\shanghaitech\bioinfo\PJ\src\sfcnn\chai_results'
+target_json =r"C:\Users\18660\Desktop\shanghaitech\bioinfo\PJ\src\sfcnn\targets\target3.json"# r'd:\Bertram Rowen\texts\code\CS177\CS177_pj\src\sfcnn\targets\target1.json'
 
 # Load index-to-protein mapping
 with open(target_json, encoding='utf-8') as f:
