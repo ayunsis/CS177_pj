@@ -6,7 +6,7 @@ import numpy as np
 import os
 import h5py
 import argparse
-from tqdm import tqdm  # <-- Add tqdm import
+from tqdm import tqdm
 
 with h5py.File('data/train_hdf5/train_grids.h5', 'r') as f:
     print("train_grids:", f['train_grids'].shape)
@@ -19,7 +19,7 @@ with h5py.File('data/test_hdf5/core_grids.h5', 'r') as f:
 
 with h5py.File('data/test_hdf5/core_label.h5', 'r') as f:
     print("core_label:", f['core_label'].shape)
-# Efficient HDF5 Dataset class
+
 class HDF5GridDataset(Dataset):
     def __init__(self, h5_path, data_key, label_path=None, label_key=None, indices=None, normalize_y=15.0):
         self.h5_path = h5_path
@@ -140,7 +140,7 @@ params = [
     {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
     {'params': last_linear.parameters(), 'weight_decay': 0.01} 
 ]
-optimizer = optim.RMSprop(model.parameters(), lr=args.lr)
+optimizer = optim.RMSprop(params, lr=args.lr)
 criterion = nn.MSELoss()
 
 # Training loop
