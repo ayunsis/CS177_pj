@@ -1,41 +1,61 @@
 import predict
-from openbabel import pybel
-from glob import glob
-import os
-import pandas as pd
+import torch
+import h5py
 import numpy as np
+import pandas as pd
+from tqdm import tqdm
 from sklearn import linear_model
-MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/weights_003-0.0148.pt'
-core_dirs = glob(os.path.join('data/coreset','*'))
-print(len(core_dirs))
+from train import HDF5GridDataset
+import scipy
 
-core_id = [os.path.split(i)[-1] for i in core_dirs]
+MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/weights_001-pearson--0.0472.pt'
 
-model = predict.build_model(MODEL_PATH)
+# --- Load coreset HDF5 as in train.py ---
+CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
+CORE_LABEL = r'data/test_hdf5/core_label.h5'
+with h5py.File(CORE_GRIDS, 'r') as f:
+    test_len = len(f['core_grids'])
+test_idx = np.arange(test_len)
 
-# f = open('src/sfcnn/outputs/output.csv','w')
-# f.write('#code\tscore\n')
-# for pdbid in core_id:
-#     proteinfile = os.path.join('data/coreset',pdbid, pdbid+ '_protein.pdb')
-#     ligandfile = os.path.join('data/coreset',pdbid, pdbid+'_ligand.mol2')
-#     protein = next(pybel.readfile('pdb',proteinfile))
-#     ligand = next(pybel.readfile('mol2',ligandfile))
-#     result = predict.predict(protein, ligand, model)
-#     f.write(pdbid+'\t%.4f\n' % result)
-# f.close()
+test_dataset = HDF5GridDataset(
+    CORE_GRIDS, 'core_grids', CORE_LABEL, 'core_label', test_idx
+)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32)
 
-predict_result = pd.read_csv('src\sfcnn\outputs\output.csv', comment='#', sep='\t', names=['pdbid', 'score'], header=0)
-core_affinity = pd.read_csv('data/core_affinity_2016.csv', sep='\t')
+# --- Load model using predict API ---
+model = predict.build_model(MODEL_PATH, dropout=0.15)
 
-df = pd.merge(predict_result, core_affinity, on='pdbid')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model.to(device)
+model.eval()
 
-regr=linear_model.LinearRegression()
-x=df['score'].values.reshape(-1,1)
-y=df['affinity'].values.reshape(-1,1)
-regr.fit( x  ,  y  )
+preds = []
+targets = []
+with torch.no_grad():
+    for xb, yb in tqdm(test_loader, desc="CASF2016 Evaluation"):
+        xb, yb = xb.to(device), yb.to(device)
+        pred = model(xb)
+        preds.append(pred.cpu().numpy())
+        targets.append(yb.cpu().numpy())
+preds = np.concatenate(preds).flatten()
+targets = np.concatenate(targets).flatten() 
+
+# Save predictions for further analysis
+df = pd.DataFrame({'score': preds, 'affinity': targets})
+df.to_csv('src/sfcnn/outputs/output.csv', sep='\t', index=False)
+
+# Linear regression and metrics
+regr = linear_model.LinearRegression()
+x = df['score'].values.reshape(-1,1)
+y = df['affinity'].values.reshape(-1,1)
+regr.fit(x, y)
 y_ = regr.predict(x)
+pearson = scipy.stats.pearsonr(df['affinity'].values, df['score'].values)[0]
+rmse = np.sqrt(np.mean((df['score']-df['affinity'])**2))
+mae = np.mean(np.abs(df['score']-df['affinity']))
+sd = np.sqrt(np.sum((y-y_)**2)/(len(df) - 1.0))
 
-print(df[['score', 'affinity']].corr())
-print('RMSE: ' + str(np.sqrt(np.mean((df['score']-df['affinity'])**2))))
-print('MAE: ' + str(np.mean(np.abs(df['score']-df['affinity']))))
-print('SD: ' + str(np.sqrt(sum((y-y_)**2)/284)))
+print('CASF2016 Pearson:', pearson)
+print('CASF2016 RMSE:', rmse)
+print('CASF2016 MAE:', mae)
+print('CASF2016 SD:', sd)
