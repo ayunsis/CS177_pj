@@ -80,7 +80,7 @@ class Feature_extractor():
                 if np.max(tmpx)<=19.5 and np.max(tmpy)<=19.5 and np.max(tmpz) <=19.5:
                     grid_rot[np.argmin(tmpx),np.argmin(tmpy),np.argmin(tmpz)] += features[i]
             grids.append(grid_rot)
-        return np.stack(grids, axis=0)  # shape: (rotations+1, 20, 20, 20, features)
+        return np.stack(grids, axis=0)  
 
 Feature = Feature_extractor()
 
@@ -106,7 +106,6 @@ with open(INDEX_PATH,'r') as f:
         if line[0] != '#':
             affinity[line.split()[0]] = float(line.split()[3])
 
-# Prepare label arrays (flattened)
 train_label = []
 core_label = []
 for i in train_new_dirs:
@@ -142,7 +141,7 @@ for directory in core_dirs:
     pdb = next(pybel.readfile('pdb',os.path.join(directory,pdb_id+'_protein.pdb')))
     core_complexes.append((pdb,ligand))   
 
-# Save core grids to HDF5 (no rotation, shape: (num_core, 20, 20, 20, 28))
+
 os.makedirs(os.path.dirname(TEST_GRIDS), exist_ok=True)
 with h5py.File(TEST_GRIDS, 'w') as h5f:
     num_core = len(core_complexes)
@@ -169,7 +168,7 @@ for directory in train_new_dirs:
     pdb = next(pybel.readfile('pdb',os.path.join(directory,pdb_id+'_protein.pdb')))
     train_complexes.append((pdb,ligand))   
 
-# Save train grids to HDF5 (flattened: (num_train*10, 20, 20, 20, 28))
+
 os.makedirs(os.path.dirname(TRAIN_GRIDS), exist_ok=True)
 with h5py.File(TRAIN_GRIDS, 'w') as h5f:
     num_train = len(train_complexes)

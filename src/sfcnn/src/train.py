@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.optim.lr_scheduler as sched
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import os
@@ -9,8 +8,6 @@ import h5py
 import argparse
 from tqdm import tqdm
 import pandas as pd
-from openbabel import pybel
-from glob import glob
 from sklearn import linear_model
 import scipy
 
@@ -68,7 +65,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.0015, type=float)
+    parser.add_argument('--lr', default=0.001, type=float)
     args = parser.parse_args()
 
     # Prepare indices for train/val split
@@ -90,9 +87,19 @@ if __name__ == '__main__':
     test_dataset = HDF5GridDataset(
         CORE_GRIDS, 'core_grids', CORE_LABEL, 'core_label', test_idx
     )
-    train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch)
+    train_loader = DataLoader(train_dataset, 
+                              batch_size=args.batch, 
+                              shuffle=True, 
+                              pin_memory=True, 
+                              num_workers=8)
+    val_loader = DataLoader(val_dataset, 
+                            batch_size=args.batch, 
+                            pin_memory=True, 
+                            num_workers=8)
+    test_loader = DataLoader(test_dataset, 
+                             batch_size=args.batch, 
+                             pin_memory=True, 
+                             num_workers=8)
     print('Dataset load finished')
 
     class CNN3D(nn.Module):
@@ -145,7 +152,7 @@ if __name__ == '__main__':
     last_linear = model.fc[-1]
     params = [
         {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
-        {'params': last_linear.parameters(), 'weight_decay': 0.03} 
+        {'params': last_linear.parameters(), 'weight_decay': 0.01} 
     ]
     optimizer = optim.RMSprop(params, lr=args.lr)
     criterion = nn.MSELoss()
@@ -153,13 +160,17 @@ if __name__ == '__main__':
     os.makedirs('src/sfcnn/src/train_results/cnnmodel', exist_ok=True)
 
     train_loss_history = []
+    train_metrics_history = []
+    val_metrics_history = []
     best_pearson = -1.0
 
-    TRAIN_EPOCHS = 200
+    TRAIN_EPOCHS = 400
 
     for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
         model.train()
         train_loss = 0
+        train_preds = []
+        train_targets = []
         for xb, yb in tqdm(train_loader, desc=f"Train {epoch:03d}", leave=False):
             xb, yb = xb.to(device), yb.to(device)  
             optimizer.zero_grad()
@@ -168,11 +179,60 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
             train_loss += loss.item() * xb.size(0)
+            train_preds.append(pred.detach().cpu().numpy())
+            train_targets.append(yb.detach().cpu().numpy())
         train_loss /= len(train_loader.dataset)
         train_loss_history.append(train_loss)
 
-        # Pearson test on CASF2016 set every epoch >= 10
-        if epoch >= 1:
+        # Compute train metrics
+        train_preds = np.concatenate(train_preds).flatten()
+        train_targets = np.concatenate(train_targets).flatten()
+        train_pearson = np.corrcoef(train_preds, train_targets)[0, 1]
+        train_rmse = np.sqrt(np.mean((train_preds - train_targets) ** 2))
+        train_mae = np.mean(np.abs(train_preds - train_targets))
+        train_regr = linear_model.LinearRegression()
+        x_train = train_preds.reshape(-1, 1)
+        y_train = train_targets.reshape(-1, 1)
+        train_regr.fit(x_train, y_train)
+        y_train_ = train_regr.predict(x_train)
+        train_sd = np.sqrt(np.sum((y_train - y_train_) ** 2) / (len(y_train) - 1.0))
+        train_metrics_history.append([epoch, train_pearson, train_rmse, train_mae, train_sd])
+        
+        if epoch >= 5:
+            model.eval()
+            preds = []
+            targets = []
+            with torch.no_grad():
+                for xb, yb in tqdm(val_loader, desc=f"Validation Metrics {epoch:03d}", leave=False):
+                    xb, yb = xb.to(device), yb.to(device)
+                    pred = model(xb)
+                    preds.append(pred.cpu().numpy())
+                    targets.append(yb.cpu().numpy())
+            preds = np.concatenate(preds).flatten()
+            targets = np.concatenate(targets).flatten()
+            pearson = np.corrcoef(preds, targets)[0, 1]
+            rmse = np.sqrt(np.mean((preds - targets) ** 2))
+            mae = np.mean(np.abs(preds - targets))
+            
+            regr = linear_model.LinearRegression()
+            x = preds.reshape(-1, 1)
+            y = targets.reshape(-1, 1)
+            regr.fit(x, y)
+            y_ = regr.predict(x)
+            sd = np.sqrt(np.sum((y - y_) ** 2) / (len(y) - 1.0))
+
+            val_metrics_history.append([epoch, pearson, rmse, mae, sd])
+
+            # print(f"Epoch {epoch:03d} Validation: R={pearson:.4f}, RMSE={rmse:.4f}, MAE={mae:.4f}, SD={sd:.4f}")
+
+            # if pearson > best_pearson:
+            #     best_pearson = pearson
+            #     torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{pearson:.4f}.pt')
+
+        np.save('src/sfcnn/src/train_results/train_metrics_history.npy', np.array(train_metrics_history))
+        np.save('src/sfcnn/src/train_results/val_metrics_history.npy', np.array(val_metrics_history))
+
+        if epoch >= 5:
             model.eval()
             preds = []
             targets = []
@@ -182,19 +242,16 @@ if __name__ == '__main__':
                     pred = model(xb)
                     preds.append(pred.cpu().numpy())
                     targets.append(yb.cpu().numpy())
-            preds = np.concatenate(preds).flatten() * 15
-            targets = np.concatenate(targets).flatten() * 15
+            preds = np.concatenate(preds).flatten() 
+            targets = np.concatenate(targets).flatten()
             pearson = np.corrcoef(preds, targets)[0, 1]
 
-            # Save best model by Pearson
             if pearson > best_pearson:
                 best_pearson = pearson
                 torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{pearson:.4f}.pt')
-                # print(f"Epoch {epoch:03d}: New best Pearson {pearson:.4f}, model saved.")
 
-    np.save('src/sfcnn/src/train_results/train_loss_history.npy', np.array(train_loss_history))
 
-    # Final evaluation on CASF2016 set after training
+   
     model.eval()
     preds = []
     targets = []
@@ -204,14 +261,14 @@ if __name__ == '__main__':
             pred = model(xb)
             preds.append(pred.cpu().numpy())
             targets.append(yb.cpu().numpy())
-    preds = np.concatenate(preds).flatten() * 15
-    targets = np.concatenate(targets).flatten() * 15
+    preds = np.concatenate(preds).flatten() 
+    targets = np.concatenate(targets).flatten() 
 
-    # Save predictions for further analysis
+    
     df = pd.DataFrame({'score': preds, 'affinity': targets})
     df.to_csv('src/sfcnn/outputs/output.csv', sep='\t', index=False)
 
-    # Linear regression and metrics
+    
     regr = linear_model.LinearRegression()
     x = df['score'].values.reshape(-1,1)
     y = df['affinity'].values.reshape(-1,1)

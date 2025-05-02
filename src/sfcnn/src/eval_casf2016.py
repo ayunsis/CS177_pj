@@ -8,9 +8,8 @@ from sklearn import linear_model
 from train import HDF5GridDataset
 import scipy
 
-MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/weights_001-pearson--0.0472.pt'
+MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/weights_141-0.7286.pt'
 
-# --- Load coreset HDF5 as in train.py ---
 CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
 CORE_LABEL = r'data/test_hdf5/core_label.h5'
 with h5py.File(CORE_GRIDS, 'r') as f:
@@ -20,9 +19,8 @@ test_idx = np.arange(test_len)
 test_dataset = HDF5GridDataset(
     CORE_GRIDS, 'core_grids', CORE_LABEL, 'core_label', test_idx
 )
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128)
 
-# --- Load model using predict API ---
 model = predict.build_model(MODEL_PATH, dropout=0.15)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -40,11 +38,9 @@ with torch.no_grad():
 preds = np.concatenate(preds).flatten()
 targets = np.concatenate(targets).flatten() 
 
-# Save predictions for further analysis
 df = pd.DataFrame({'score': preds, 'affinity': targets})
 df.to_csv('src/sfcnn/outputs/output.csv', sep='\t', index=False)
 
-# Linear regression and metrics
 regr = linear_model.LinearRegression()
 x = df['score'].values.reshape(-1,1)
 y = df['affinity'].values.reshape(-1,1)
