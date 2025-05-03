@@ -65,7 +65,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.001, type=float)
+    parser.add_argument('--lr', default=0.002, type=float)
     args = parser.parse_args()
 
     # Prepare indices for train/val split
@@ -162,6 +162,7 @@ if __name__ == '__main__':
     train_loss_history = []
     train_metrics_history = []
     val_metrics_history = []
+    test_metrics_history = []
     best_pearson = -1.0
 
     TRAIN_EPOCHS = 400
@@ -229,8 +230,6 @@ if __name__ == '__main__':
             #     best_pearson = pearson
             #     torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{pearson:.4f}.pt')
 
-        np.save('src/sfcnn/src/train_results/train_metrics_history.npy', np.array(train_metrics_history))
-        np.save('src/sfcnn/src/train_results/val_metrics_history.npy', np.array(val_metrics_history))
 
         if epoch >= 5:
             model.eval()
@@ -245,10 +244,23 @@ if __name__ == '__main__':
             preds = np.concatenate(preds).flatten() 
             targets = np.concatenate(targets).flatten()
             pearson = np.corrcoef(preds, targets)[0, 1]
+            rmse = np.sqrt(np.mean((preds - targets) ** 2))
+            mae = np.mean(np.abs(preds - targets))
+            regr = linear_model.LinearRegression()
+            x = preds.reshape(-1, 1)
+            y = targets.reshape(-1, 1)
+            regr.fit(x, y)
+            y_ = regr.predict(x)
+            sd = np.sqrt(np.sum((y - y_) ** 2) / (len(y) - 1.0))
+            test_metrics_history.append([epoch, pearson, rmse, mae, sd])  # <-- Add this line
 
             if pearson > best_pearson:
                 best_pearson = pearson
                 torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{pearson:.4f}.pt')
+
+        np.save('src/sfcnn/src/train_results/train_metrics_history.npy', np.array(train_metrics_history))
+        np.save('src/sfcnn/src/train_results/val_metrics_history.npy', np.array(val_metrics_history))
+        np.save('src/sfcnn/src/train_results/test_metrics_history.npy', np.array(test_metrics_history))
 
 
    
