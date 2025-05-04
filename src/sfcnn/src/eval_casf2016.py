@@ -19,7 +19,7 @@ test_idx = np.arange(test_len)
 test_dataset = HDF5GridDataset(
     CORE_GRIDS, 'core_grids', CORE_LABEL, 'core_label', test_idx
 )
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
 
 model = predict.build_model(MODEL_PATH, dropout=0.15)
 

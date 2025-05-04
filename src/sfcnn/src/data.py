@@ -157,7 +157,7 @@ with h5py.File(TEST_GRIDS, 'w') as h5f:
         features=np.concatenate([features1,features2],axis = 0)
         assert len(coords) == len(features)
         coords = coords-center
-        grid=Feature.grid(coords,features,rotations=0)[0]  # only the original
+        grid=Feature.grid(coords,features,rotations=0)[0]  
         dset[idx] = grid
 
 print("Processing training complexes...")

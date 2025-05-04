@@ -10,6 +10,8 @@ from tqdm import tqdm
 import pandas as pd
 from sklearn import linear_model
 import scipy
+import warnings
+warnings.filterwarnings("ignore")
 
 class HDF5GridDataset(Dataset):
     def __init__(self, h5_path, data_key, label_path=None, label_key=None, indices=None, normalize_y=15.0):
@@ -61,14 +63,12 @@ if __name__ == '__main__':
         val_idx = all_idx[val_start:]
         return train_idx, val_idx
 
-    # Argument parsing
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
-    parser.add_argument('--dropout', '-d', default=0.15, type=float)
+    parser.add_argument('--dropout', '-d', default=0.2, type=float)
     parser.add_argument('--lr', default=0.002, type=float)
     args = parser.parse_args()
 
-    # Prepare indices for train/val split
     with h5py.File(TRAIN_GRIDS, 'r') as f:
         total = len(f['train_grids'])
     train_idx, val_idx = get_indices(total)
@@ -77,7 +77,6 @@ if __name__ == '__main__':
         test_len = len(f['core_grids'])
     test_idx = np.arange(test_len)
 
-    # Datasets and loaders
     train_dataset = HDF5GridDataset(
         TRAIN_GRIDS, 'train_grids', TRAIN_LABEL, 'train_label', train_idx
     )
@@ -165,7 +164,7 @@ if __name__ == '__main__':
     test_metrics_history = []
     best_pearson = -1.0
 
-    TRAIN_EPOCHS = 400
+    TRAIN_EPOCHS = 200
 
     for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
         model.train()
@@ -185,7 +184,6 @@ if __name__ == '__main__':
         train_loss /= len(train_loader.dataset)
         train_loss_history.append(train_loss)
 
-        # Compute train metrics
         train_preds = np.concatenate(train_preds).flatten()
         train_targets = np.concatenate(train_targets).flatten()
         train_pearson = np.corrcoef(train_preds, train_targets)[0, 1]
@@ -224,12 +222,6 @@ if __name__ == '__main__':
 
             val_metrics_history.append([epoch, pearson, rmse, mae, sd])
 
-            # print(f"Epoch {epoch:03d} Validation: R={pearson:.4f}, RMSE={rmse:.4f}, MAE={mae:.4f}, SD={sd:.4f}")
-
-            # if pearson > best_pearson:
-            #     best_pearson = pearson
-            #     torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{pearson:.4f}.pt')
-
 
         if epoch >= 5:
             model.eval()
@@ -262,36 +254,3 @@ if __name__ == '__main__':
         np.save('src/sfcnn/src/train_results/val_metrics_history.npy', np.array(val_metrics_history))
         np.save('src/sfcnn/src/train_results/test_metrics_history.npy', np.array(test_metrics_history))
 
-
-   
-    model.eval()
-    preds = []
-    targets = []
-    with torch.no_grad():
-        for xb, yb in tqdm(test_loader, desc="Final CASF2016 Evaluation", leave=False):
-            xb, yb = xb.to(device), yb.to(device)
-            pred = model(xb)
-            preds.append(pred.cpu().numpy())
-            targets.append(yb.cpu().numpy())
-    preds = np.concatenate(preds).flatten() 
-    targets = np.concatenate(targets).flatten() 
-
-    
-    df = pd.DataFrame({'score': preds, 'affinity': targets})
-    df.to_csv('src/sfcnn/outputs/output.csv', sep='\t', index=False)
-
-    
-    regr = linear_model.LinearRegression()
-    x = df['score'].values.reshape(-1,1)
-    y = df['affinity'].values.reshape(-1,1)
-    regr.fit(x, y)
-    y_ = regr.predict(x)
-    pearson = scipy.stats.pearsonr(df['affinity'].values, df['score'].values)[0]
-    rmse = np.sqrt(np.mean((df['score']-df['affinity'])**2))
-    mae = np.mean(np.abs(df['score']-df['affinity']))
-    sd = np.sqrt(np.sum((y-y_)**2)/(len(df) - 1.0))
-
-    print('Final CASF2016 Pearson:', pearson)
-    print('Final CASF2016 RMSE:', rmse)
-    print('Final CASF2016 MAE:', mae)
-    print('Final CASF2016 SD:', sd)
