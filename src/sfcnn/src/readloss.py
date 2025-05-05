@@ -6,7 +6,7 @@ train_metrics = np.load('src/sfcnn/src/train_results/train_metrics_history.npy')
 val_metrics = np.load('src/sfcnn/src/train_results/val_metrics_history.npy')
 test_metrics = np.load('src/sfcnn/src/train_results/test_metrics_history.npy')
 
-# Pad the shorter array with zeros
+
 max_len = max(train_metrics.shape[0], val_metrics.shape[0])
 tm = np.zeros((max_len, train_metrics.shape[1]))
 vm = np.zeros((max_len, val_metrics.shape[1]))

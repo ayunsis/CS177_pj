@@ -7,8 +7,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 # Paths (adjust as needed)
-index_folder_root = r'data\chai_results_zip\target1'
-target_json = r'src\sfcnn\targets\target1.json'
+index_folder_root = r'data\chai_results_zip\target3'
+target_json = r'src\sfcnn\targets\target3.json'
 output_root = r'data\chai_results_cif'
 
 # Load index-to-protein mapping

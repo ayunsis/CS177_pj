@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
-    parser.add_argument('--dropout', '-d', default=0.2, type=float)
+    parser.add_argument('--dropout', '-d', default=0.15, type=float)
     parser.add_argument('--lr', default=0.002, type=float)
     args = parser.parse_args()
 
@@ -165,6 +165,7 @@ if __name__ == '__main__':
     best_pearson = -1.0
 
     TRAIN_EPOCHS = 200
+    SAVE_EPOCHS = 0
 
     for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
         model.train()
@@ -197,7 +198,7 @@ if __name__ == '__main__':
         train_sd = np.sqrt(np.sum((y_train - y_train_) ** 2) / (len(y_train) - 1.0))
         train_metrics_history.append([epoch, train_pearson, train_rmse, train_mae, train_sd])
         
-        if epoch >= 5:
+        if epoch >= SAVE_EPOCHS:
             model.eval()
             preds = []
             targets = []
@@ -223,7 +224,7 @@ if __name__ == '__main__':
             val_metrics_history.append([epoch, pearson, rmse, mae, sd])
 
 
-        if epoch >= 5:
+        if epoch >= SAVE_EPOCHS:
             model.eval()
             preds = []
             targets = []
@@ -244,7 +245,7 @@ if __name__ == '__main__':
             regr.fit(x, y)
             y_ = regr.predict(x)
             sd = np.sqrt(np.sum((y - y_) ** 2) / (len(y) - 1.0))
-            test_metrics_history.append([epoch, pearson, rmse, mae, sd])  # <-- Add this line
+            test_metrics_history.append([epoch, pearson, rmse, mae, sd])  
 
             if pearson > best_pearson:
                 best_pearson = pearson
