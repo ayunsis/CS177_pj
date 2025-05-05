@@ -111,6 +111,7 @@ core_label = []
 for i in train_new_dirs:
     pdb_id=os.path.split(i)[1]
     train_label.extend([affinity[pdb_id]]*10)
+    
 for i in core_dirs:
     core_id=os.path.split(i)[1]
     if not affinity.get(core_id):

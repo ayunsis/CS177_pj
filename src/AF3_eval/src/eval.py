@@ -33,7 +33,7 @@ class HDF5GridDataset(Dataset):
         else:
             return grid
         
-        
+
 MODEL_PATH = 'src/AF3_eval/model/pearson-0.728.pt'
 CORE_GRIDS = r'data/chai_hdf5/core_grids.h5'
 CORE_2016_LABEL = r'data/chai_hdf5/core_2016_label.h5'
@@ -48,6 +48,7 @@ model = predict.build_model(MODEL_PATH, dropout=0.15)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 model.eval()
+core_csv = pd.read_csv('data/core_affinity_final.csv')
 
 def evaluate(label_path, label_key, output_csv, desc):
     test_dataset = HDF5GridDataset(
@@ -66,8 +67,8 @@ def evaluate(label_path, label_key, output_csv, desc):
     preds = np.concatenate(preds).flatten()
     targets = np.concatenate(targets).flatten() 
 
-    df = pd.DataFrame({'score': preds, 'affinity': targets})
-    df.to_csv(output_csv, sep='\t', index=False)
+    df = pd.DataFrame({'pdbid':core_csv['pdbid'], 'score': preds, 'affinity': targets})
+    df.to_csv(output_csv, sep=',', index=False)
 
     regr = linear_model.LinearRegression()
     x = df['score'].values.reshape(-1,1)
@@ -86,7 +87,5 @@ def evaluate(label_path, label_key, output_csv, desc):
 
 
 evaluate(CORE_2016_LABEL, 'core_label', 'src/AF3_eval/outputs/output_core2016.csv', 'CASF2016')
-
-
 evaluate(CORE_sfcnn_LABEL, 'core_label', 'src/AF3_eval/outputs/output_sfcnn.csv', 'CASF2016 SFCNN')
 

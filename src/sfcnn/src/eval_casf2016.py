@@ -27,6 +27,7 @@ model = predict.build_model(MODEL_PATH, dropout=0.15)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 model.eval()
+core_csv = pd.read_csv('data/core_affinity_2016.csv')
 
 preds = []
 targets = []
@@ -40,10 +41,17 @@ preds = np.concatenate(preds ).flatten()
 targets = np.concatenate(targets).flatten() 
 
 df = pd.DataFrame({'score': preds, 'affinity': targets})
-out_df = pd.DataFrame({'score': preds})
-out_df = out_df.drop([84, 95, 67, 68, 69, 25]).reset_index(drop=True)
-out_df.to_csv('data/sfcnn_out.csv', sep='\t', index=False)
-df.to_csv('src/sfcnn/outputs/output.csv', sep='\t', index=False)
+out_df = pd.DataFrame({'pdbid': core_csv['pdbid'],
+                       'affinity': preds})
+
+pdbids_to_drop = ['2xb8', '2ymd', '3n76', '3n7a', '3n86', '4ciw']
+indices_to_drop = core_csv[core_csv['pdbid'].isin(pdbids_to_drop)].index.tolist()
+out_df = out_df.drop(indices_to_drop).reset_index(drop=True)
+core_csv = core_csv.drop(indices_to_drop).reset_index(drop=True)
+
+core_csv.to_csv('data/core_affinity_final.csv', sep=',', index=False)
+out_df.to_csv('data/sfcnn_out.csv', sep=',', index=False)
+df.to_csv('src/sfcnn/outputs/output.csv', sep=',', index=False)
 
 regr = linear_model.LinearRegression()
 x = df['score'].values.reshape(-1,1)

@@ -10,6 +10,7 @@ from openbabel import pybel
 import numpy as np
 import random
 import h5py
+import pandas as pd
 
 class Feature_extractor():
     def __init__(self):
@@ -89,31 +90,43 @@ print("Preparing core directory...")
 core_dirs = glob(os.path.join(CORE_PATH, '*'))
 core_dirs.sort()
 
-# TODO modify core label to the sfcnn_one and core_2016 label
-INDEX_PATH = r'data/PDBbind_v2019_plain_text_index/index/INDEX_general_PL_data.2019'
-print("Loading affinity data...")
-affinity = {}
-with open(INDEX_PATH, 'r') as f:
-    for line in f:
-        if not line.startswith('#'):
-            parts = line.split()
-            affinity[parts[0]] = float(parts[3])
 
-# Prepare core label array
-core_label = []
+sfcnn_csv = r'data/sfcnn_out.csv'
+core2016_csv = r'data/core_affinity_final.csv'
+
+
+sfcnn_df = pd.read_csv(sfcnn_csv)
+sfcnn_labels = []
 for directory in core_dirs:
     cid = os.path.basename(directory)
-    if cid in affinity:
-        core_label.append(affinity[cid])
-core_label = np.array(core_label, dtype=np.float32)
+    row = sfcnn_df[sfcnn_df['pdbid'] == cid]
+    if not row.empty:
+        sfcnn_labels.append(float(row.iloc[0]['affinity']))
+sfcnn_labels = np.array(sfcnn_labels, dtype=np.float32)
+
+
+core2016_df = pd.read_csv(core2016_csv)
+core2016_labels = []
+for directory in core_dirs:
+    cid = os.path.basename(directory)
+    row = core2016_df[core2016_df['pdbid'] == cid]
+    if not row.empty:
+        core2016_labels.append(float(row.iloc[0]['affinity']))
+core2016_labels = np.array(core2016_labels, dtype=np.float32)
+
+
 
 CORE_LABELS = r'data/chai_hdf5/core_label.h5'
+CORE_2016_LABELS = r'data/chai_hdf5/core_2016_label.h5'
+CORE_sfcnn_LABELS = r'data/chai_hdf5/core_sfcnn_label.h5'
 TEST_GRIDS  = r'data/chai_hdf5/core_grids.h5'
 
 print("Saving core label data...")
 os.makedirs(os.path.dirname(CORE_LABELS), exist_ok=True)
-with h5py.File(CORE_LABELS, 'w') as f:
-    f.create_dataset('core_label', data=core_label)
+with h5py.File(CORE_2016_LABELS, 'w') as f:
+    f.create_dataset('core_label', data=core2016_labels)
+with h5py.File(CORE_sfcnn_LABELS, 'w') as f:
+    f.create_dataset('core_label', data=sfcnn_labels)
 
 print("Processing core complexes...")
 core_complexes = []
