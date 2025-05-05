@@ -1,0 +1,5 @@
+batch=32
+dropout=0.15
+lr=0.002
+fc_decay=0.01
+epochs=200

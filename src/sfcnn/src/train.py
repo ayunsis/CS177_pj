@@ -7,9 +7,7 @@ import os
 import h5py
 import argparse
 from tqdm import tqdm
-import pandas as pd
 from sklearn import linear_model
-import scipy
 import warnings
 warnings.filterwarnings("ignore")
 

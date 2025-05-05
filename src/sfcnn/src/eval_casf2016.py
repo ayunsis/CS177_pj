@@ -8,7 +8,8 @@ from sklearn import linear_model
 from train import HDF5GridDataset
 import scipy
 
-MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/weights_141-0.7286.pt'
+MODEL_PATH = 'src/sfcnn/src/train_results/valuable_models/pearson-0.728.pt'
+
 
 CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
 CORE_LABEL = r'data/test_hdf5/core_label.h5'
@@ -19,7 +20,7 @@ test_idx = np.arange(test_len)
 test_dataset = HDF5GridDataset(
     CORE_GRIDS, 'core_grids', CORE_LABEL, 'core_label', test_idx
 )
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32)
 
 model = predict.build_model(MODEL_PATH, dropout=0.15)
 
