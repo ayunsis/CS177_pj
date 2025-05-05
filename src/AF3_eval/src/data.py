@@ -89,6 +89,7 @@ print("Preparing core directory...")
 core_dirs = glob(os.path.join(CORE_PATH, '*'))
 core_dirs.sort()
 
+# TODO modify core label to the sfcnn_one and core_2016 label
 INDEX_PATH = r'data/PDBbind_v2019_plain_text_index/index/INDEX_general_PL_data.2019'
 print("Loading affinity data...")
 affinity = {}

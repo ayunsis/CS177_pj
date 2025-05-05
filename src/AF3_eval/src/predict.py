@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+
 class Feature_extractor():
     def __init__(self):
         self.atom_codes = {}

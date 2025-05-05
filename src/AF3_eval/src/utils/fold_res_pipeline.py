@@ -7,8 +7,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 # Paths (adjust as needed)
-index_folder_root = r'data\chai_results_zip\target3'
-target_json = r'src\sfcnn\targets\target3.json'
+index_folder_root = r'data\chai_results_zip\target2'
+target_json = r'src\sfcnn\targets\target2.json'
 output_root = r'data\chai_results_cif'
 
 # Load index-to-protein mapping
@@ -64,16 +64,3 @@ for fname in os.listdir(index_folder_root):
         with zipf.open(cif_file) as source, open(dest_cif_path, 'wb') as target:
             shutil.copyfileobj(source, target)
         print(f"Extracted {cif_file} from {zip_path} -> {dest_cif_path}")
-
-        # # Convert .cif to .pdb
-        # pdb_path = os.path.join(dest_folder, f"{protein_name}.pdb")
-        # parser = MMCIFParser()
-        # structure = parser.get_structure("protein", dest_cif_path)
-        # io = PDBIO()
-        # io.set_structure(structure)
-        # io.save(pdb_path)
-        # print(f"PDB written to {pdb_path}")
-
-        # # Convert .pdb to .mol2 (ligand extraction)
-        # mol2_path = os.path.join(dest_folder, f"{protein_name}.mol2")
-        # extract_ligand_pdb_to_mol2(pdb_path, mol2_path)
