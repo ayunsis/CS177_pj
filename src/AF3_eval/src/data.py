@@ -146,13 +146,12 @@ print("Processing core complexes...")
 core_complexes = []
 parser = MMCIFParser(QUIET=True)
 
-# Map element symbol to atomic number
 element_to_num = {
     'H': 1, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'P': 15, 'S': 16, 'CL': 17, 'K': 19, 'CA': 20, 'ZN': 30, 'MG': 12, 'FE': 26, 'CU': 29, 'MN': 25, 'BR': 35, 'I': 53, 'SE': 34
 }
 def get_atomic_number(atom):
     symbol = atom.element.strip().upper()
-    return element_to_num.get(symbol, 6)  # default to carbon
+    return element_to_num.get(symbol, 6) 
 
 class AtomWrapper:
     def __init__(self, atom):
