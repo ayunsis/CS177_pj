@@ -2,16 +2,11 @@ import os
 import json
 import shutil
 import zipfile
-from Bio.PDB import MMCIFParser, PDBIO
-from rdkit import Chem
-from rdkit.Chem import AllChem
 
-# Paths (adjust as needed)
 index_folder_root = r'data/chai_results_zip/target2'
 target_json = r'src\sfcnn/targets/target2.json'
 output_root = r'data/chai_results_cif'
 
-# Load index-to-protein mapping
 with open(target_json, encoding='utf-8') as f:
     data = json.load(f)
 index_to_protein = {str(v['index']): k for k, v in data.items()}
@@ -33,7 +28,7 @@ for fname in os.listdir(index_folder_root):
         dest_folder = os.path.join(output_root, protein_name)
         os.makedirs(dest_folder, exist_ok=True)
         dest_cif_path = os.path.join(dest_folder, f"{protein_name}.cif")
-        # Decode and save .cif file
+
         with zipf.open(cif_file) as source, open(dest_cif_path, 'wb') as target:
             shutil.copyfileobj(source, target)
         print(f"Extracted {cif_file} from {zip_path} -> {dest_cif_path}")

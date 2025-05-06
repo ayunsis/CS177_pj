@@ -6,17 +6,28 @@ os.environ["OPENBABEL_WARNINGS"] = "0"
 
 print("Importing libraries...")
 from glob import glob
-from openbabel import pybel
 import numpy as np
 import random
 import h5py
 import pandas as pd
+from Bio.PDB import MMCIFParser
+from Bio.PDB.Polypeptide import is_aa
 
 class Feature_extractor():
     def __init__(self):
         self.atom_codes = {}
-        others = ([3,4,5,11,12,13]+list(range(19,32))+list(range(37,51))+list(range(55,84)))
-        atom_types = [1,(6,1),(6,2),(6,3),(7,1),(7,2),(7,3),8,15,(16,2),(16,3),34,[9,17,35,53],others]
+        self.others = ([3,4,5,11,12,13]+list(range(19,32))+list(range(37,51))+list(range(55,84)))
+        atom_types = [
+            1,
+            (6,1),(6,2),(6,3),
+            (7,1),(7,2),(7,3),
+            8,
+            15,
+            (16,2),(16,3),  
+            34,
+            [9,17,35,53],
+            self.others
+        ]
         for i, j in enumerate(atom_types):
             if type(j) is list:
                 for k in j:
@@ -24,13 +35,19 @@ class Feature_extractor():
             else:
                 self.atom_codes[j] = i              
         self.sum_atom_types = len(atom_types)
+
     def encode(self, atomic_num, molprotein):
+        key = atomic_num
+        if key not in self.atom_codes and isinstance(key, tuple):
+            key = (6, 1)
         encoding = np.zeros(self.sum_atom_types*2)
         if molprotein == 1:
-            encoding[self.atom_codes[atomic_num]] = 1.0
+            encoding[self.atom_codes[key]] = 1.0
         else:
-            encoding[self.sum_atom_types+self.atom_codes[atomic_num]] = 1.0
+            encoding[self.sum_atom_types+self.atom_codes[key]] = 1.0
+        
         return encoding
+    
     def get_features(self, molecule, molprotein):
         coords = []
         features = []
@@ -44,6 +61,7 @@ class Feature_extractor():
         coords = np.array(coords, dtype=np.float32)
         features = np.array(features, dtype=np.float32)
         return coords, features
+    
     def rotation_matrix(self, t, roller):
         if roller==0:
             return np.array([[1,0,0],[0,np.cos(t),np.sin(t)],[0,-np.sin(t),np.cos(t)]])
@@ -51,6 +69,7 @@ class Feature_extractor():
             return np.array([[np.cos(t),0,-np.sin(t)],[0,1,0],[np.sin(t),0,np.cos(t)]])
         elif roller==2:
             return np.array([[np.cos(t),np.sin(t),0],[-np.sin(t),np.cos(t),0],[0,0,1]])
+        
     def grid(self,coords, features, resolution=1.0, max_dist=10.0, rotations=9):
         assert coords.shape[1] == 3
         assert coords.shape[0] == features.shape[0]  
@@ -85,15 +104,13 @@ class Feature_extractor():
 
 Feature = Feature_extractor()
 
-CORE_PATH = r'data/chai_results_pdb'
+CORE_PATH = r'data/chai_results_cif'
 print("Preparing core directory...")
 core_dirs = glob(os.path.join(CORE_PATH, '*'))
 core_dirs.sort()
 
-
 sfcnn_csv = r'data/sfcnn_out.csv'
 core2016_csv = r'data/core_affinity_final.csv'
-
 
 sfcnn_df = pd.read_csv(sfcnn_csv)
 sfcnn_labels = []
@@ -104,7 +121,6 @@ for directory in core_dirs:
         sfcnn_labels.append(float(row.iloc[0]['affinity']))
 sfcnn_labels = np.array(sfcnn_labels, dtype=np.float32)
 
-
 core2016_df = pd.read_csv(core2016_csv)
 core2016_labels = []
 for directory in core_dirs:
@@ -113,8 +129,6 @@ for directory in core_dirs:
     if not row.empty:
         core2016_labels.append(float(row.iloc[0]['affinity']))
 core2016_labels = np.array(core2016_labels, dtype=np.float32)
-
-
 
 CORE_LABELS = r'data/chai_hdf5/core_label.h5'
 CORE_2016_LABELS = r'data/chai_hdf5/core_2016_label.h5'
@@ -130,16 +144,45 @@ with h5py.File(CORE_sfcnn_LABELS, 'w') as f:
 
 print("Processing core complexes...")
 core_complexes = []
+parser = MMCIFParser(QUIET=True)
+
+# Map element symbol to atomic number
+element_to_num = {
+    'H': 1, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'P': 15, 'S': 16, 'CL': 17, 'K': 19, 'CA': 20, 'ZN': 30, 'MG': 12, 'FE': 26, 'CU': 29, 'MN': 25, 'BR': 35, 'I': 53, 'SE': 34
+}
+def get_atomic_number(atom):
+    symbol = atom.element.strip().upper()
+    return element_to_num.get(symbol, 6)  # default to carbon
+
+class AtomWrapper:
+    def __init__(self, atom):
+        self.coords = atom.coord
+        self.atomicnum = get_atomic_number(atom)
+        self.hyb = 1  
+
 for directory in core_dirs:
     cid = os.path.basename(directory)
-    ligand = next(pybel.readfile('mol2', os.path.join(directory, cid + '_ligand.mol2')))
-    pdb    = next(pybel.readfile('pdb',  os.path.join(directory, cid + '_protein.pdb')))
-    core_complexes.append((pdb, ligand))
+    cif_path = os.path.join(directory, cid + '.cif')
+    structure = parser.get_structure(cid, cif_path)
+    protein_atoms = []
+    ligand_atoms = []
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                if is_aa(residue, standard=True):
+                    for atom in residue:
+                        protein_atoms.append(atom)
+                else:
+                    for atom in residue:
+                        ligand_atoms.append(atom)
+    pdb_atoms = [AtomWrapper(atom) for atom in protein_atoms]
+    lig_atoms = [AtomWrapper(atom) for atom in ligand_atoms]
+    core_complexes.append((pdb_atoms, lig_atoms))
 
 os.makedirs(os.path.dirname(TEST_GRIDS), exist_ok=True)
 with h5py.File(TEST_GRIDS, 'w') as h5f:
     num_core = len(core_complexes)
-    # sample shape for dataset
+
     coords_p, feats_p = Feature.get_features(core_complexes[0][0], 1)
     coords_l, feats_l = Feature.get_features(core_complexes[0][1], 0)
     sample_grid = Feature.grid(

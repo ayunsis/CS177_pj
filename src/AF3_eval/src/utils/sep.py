@@ -1,14 +1,11 @@
 import json
 
-# Load the original JSON file
 with open('src/sfcnn/targets/coreset_smiles_chains.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
-# Get all keys and split into chunks of 95
 keys = list(data.keys())
 chunks = [keys[i:i+95] for i in range(0, len(keys), 95)]
 
-# Write each chunk to a new JSON file
 for idx, chunk in enumerate(chunks, 1):
     split_data = {k: data[k] for k in chunk}
     with open(f'target{idx}.json', 'w', encoding='utf-8') as f:

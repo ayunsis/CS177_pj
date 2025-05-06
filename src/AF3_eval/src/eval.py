@@ -87,5 +87,5 @@ def evaluate(label_path, label_key, output_csv, desc):
 
 
 evaluate(CORE_2016_LABEL, 'core_label', 'src/AF3_eval/outputs/output_core2016.csv', 'CASF2016')
-evaluate(CORE_sfcnn_LABEL, 'core_label', 'src/AF3_eval/outputs/output_sfcnn.csv', 'CASF2016 SFCNN')
+evaluate(CORE_sfcnn_LABEL, 'core_label', 'src/AF3_eval/outputs/output_sfcnn.csv', 'SFCNN')
 
