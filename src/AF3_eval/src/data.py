@@ -33,20 +33,22 @@ class Feature_extractor():
                 for k in j:
                     self.atom_codes[k] = i
             else:
-                self.atom_codes[j] = i              
+                self.atom_codes[j] = i         
+        print(self.atom_codes)     
         self.sum_atom_types = len(atom_types)
 
     def encode(self, atomic_num, molprotein):
         key = atomic_num
-        if key not in self.atom_codes and isinstance(key, tuple):
-            key = (6, 1)
         encoding = np.zeros(self.sum_atom_types*2)
+        if key not in self.atom_codes and isinstance(key, tuple):
+            key=83
         if molprotein == 1:
             encoding[self.atom_codes[key]] = 1.0
         else:
             encoding[self.sum_atom_types+self.atom_codes[key]] = 1.0
         
         return encoding
+    
     
     def get_features(self, molecule, molprotein):
         coords = []
