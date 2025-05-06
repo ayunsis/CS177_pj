@@ -7,41 +7,14 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 # Paths (adjust as needed)
-index_folder_root = r'data\chai_results_zip\target2'
-target_json = r'src\sfcnn\targets\target2.json'
-output_root = r'data\chai_results_cif'
+index_folder_root = r'data/chai_results_zip/target2'
+target_json = r'src\sfcnn/targets/target2.json'
+output_root = r'data/chai_results_cif'
 
 # Load index-to-protein mapping
 with open(target_json, encoding='utf-8') as f:
     data = json.load(f)
 index_to_protein = {str(v['index']): k for k, v in data.items()}
-
-def extract_ligand_pdb_to_mol2(pdb_path, mol2_path, ligand_resname="LIG2", chain_id="B"):
-    ligand_lines = []
-    with open(pdb_path, "r") as f:
-        for line in f:
-            if line.startswith("HETATM"):
-                ligand_lines.append(line)
-    if not ligand_lines:
-        print("Ligand not found.")
-        return
-
-    tmp_pdb = os.path.join(os.path.dirname(mol2_path), "ligand_tmp.pdb")
-    with open(tmp_pdb, "w") as f:
-        for line in ligand_lines:
-            f.write(line)
-        f.write("END\n")
-
-    mol = Chem.MolFromPDBFile(tmp_pdb, removeHs=False)
-    if mol is None:
-        print("Failed to parse ligand PDB.")
-        return
-
-    if mol.GetNumConformers() == 0:
-        AllChem.EmbedMolecule(mol)
-
-    Chem.MolToMol2File(mol, mol2_path)
-    print(f"Ligand written to {mol2_path}")
 
 for fname in os.listdir(index_folder_root):
     if not fname.lower().endswith('.zip'):
