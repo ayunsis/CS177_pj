@@ -8,17 +8,16 @@
 #import "@preview/abiding-ifacconf:0.1.0": *
 #show: ifacconf-rules
 #show: ifacconf.with(
-  title: "RimWorld Combat Agent: 
-  A Reinforcement Learning Approach",
+  title: "Assessing the Reliability of AlphaFold3 Predictions forProtein-Ligand Affinity Prediction via Sfcnn",
   authors: (
-    (
-      name: "Linzheng Tang (2022533087)",
-      email: "tanglzh2022@shanghaitech.edu.cn",
-      affiliation: 1,
-    ),
     (
       name: "Guo Yu (2022533074)",
       email: "yuguo2022@shanghaitech.edu.cn",
+      affiliation: 1,
+    ),
+    (
+      name: "Linzheng Tang (2022533087)",
+      email: "tanglzh2022@shanghaitech.edu.cn",
       affiliation: 1,
     ),
     (
@@ -31,101 +30,62 @@
     (
       organization: "ShanghaiTech University",
     ),
-  ),  abstract: [
-    This paper presents agents implemented by several different reinforcement learning approaches, regarding the combat mechanism in the single player game RimWorld. 
-    The agents are trained to develop strategies to defeat the enemy in the one-on-one shooting scenario, based on Deep-Q-learning, Proximal Policy Optimization and Policy Gradient algorithms.
+  ), abstract: [
+    This project investigates the reliability of using AlphaFold3 (AF3)-predicted structures as an alternative. Sfcnn, a 3D-CNN based protein-ligand affinity prediction model, is reproduced using PyTorch, and its performance is validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. The AF3-derived protein structures of CASF-2016 core set is then evaluated and compared against the groundtruth and Sfcnn scores on the core set to assess the viability of AF3 predictions in PLA tasks.
   ],
-  keywords: ("RimWorld", "Deep-Q-learning", "Proximal Policy Optimization", "Policy Gradient"),
+  keywords: ("AlphaFold3", "protein-ligand affinity", "CNN scoring function", "CASF-2016"),
 
 )
 
 = Introduction
 
-== Game Background
-RimWorld is a construction and management simulation video game developed by Canadian game designer Tynan Sylvester and published by Ludeon Studios. 
+== Sfcnn Background
+Sfcnn is a 3D convolutional neural network based scoring function
+model proposed in 2022, which aims to provide accurate and reliable scores for binding affinities of protein-ligand complexes.
 
 
-== Combat Scenario
+== Data Methods
 
-=== Map
-Specifically, the agents are applied to a 2 dimensional map of 15x15 grids. A complex architectural structure is placed in the middle and trees are uniformly distributed, walls forming the structure and trees are fixed. 
+=== Dataset 
+The Sfcnn network was trained with protein–ligand complexes from the refined set of the PDBbind database version 2019, which contains protein−ligand complexes and their corresponding binding affinities expressed with pKa values, the trained network is later tested on the CASF-2016 core set, which has 285 protein–ligand complexes. 
 
-The walls are impenetrable, hiding behind them and the trees can reduce the other party's shooting accuracy towards the pawn. 
-
-
-=== Pawns
-The enemy pawn and ally pawn are born diagonally opposite to each other with the same equipments, health status and skill points. The ally pawn can go anywhere in the map where the point is not blocked by walls, while the enemy pawn will wander around birth point in defense. 
-
-Once the two pawns are in each other's sight, they will exchange fire automatically with aiming intervals between shots, the aiming process will be interrupted if the pawn moves during it.
-
-=== Winning Criteria
-When a pawn suffers too much blood loss, pain or certain critical wounds, it will be paralyzed and unable to continue fighting (not necessarily dead). Under this circumstance, the game is deemed over and the other party will be declared as the winner. If both parties are paralyzed at the same time, ally wins.  
-
-The detailed explanation of the paralyzing mechanism will be covered in the design of the reward function in the following sections.
-
-=== Other Factors
-Weather conditions and time slots are unmodified and will preserve certain randomness of the game. For instance, shooting accuracy of both parties will be reduced in foggy rain or at night.
-
-== Combat Map
-
-#figure(
-  image("images/paper/map.png", height: 50%, width: 80%,fit: "contain"),
-  caption: [Combat Map],
-) <map>
+Note that the overlaps between train set and test set (266 
+protein complexes) are excluded, leaving 4852 train complexes in total.
 
 
-= Environment
-The training environment is built based on Gymnasium, which is a python reinforcement learning framework maintained by Farama Foundation. The reinforcement learning agents are applied in the form of a game mod, named "Combat Agent". 
+=== Augumentation 
+To scale up the training set, each protein-ligand complex is rotated randomly for 9 times using random rotation matrices,
+those 10 complexes should bear the same PLA (protein-ligand affinity) score, resulting in total 48520 complexes for training
 
-The server side(agent) and client side(game) has a communication interval of 0.5 seconds, agents are trained in parallel in the vectorized environment with the following specifications:
-
-== Action Space
-Due to the short communication interval, the action space is restricted by the pawn's walking speed. 
-The action space is therefore defined as a unit length nine-square grid, centering the ally pawn, whose relative coordinates is set to (0, 0).
-
-An action is defined as the coordinate within the relative nine-square grid.
-
-== Observation Space
-The observation space consists of 6 layers in total, each layer represents certain information of the current game state and is shaped 15x15.
-Those layers are viewed as 6 channels of the observation space.
-
-=== Ally position layer
-A binary map, where the value is 1 if the ally pawn is at the corresponding position, otherwise 0.
-
-=== Enemy position layer
-A binary map, where the value is 1 if the enemy pawn is at the corresponding position, otherwise 0.
-
-=== Cover positions layer
-A discrete map, where 1 represents the tree position and 2 represents the wall position.
-
-=== Aiming layer
-A binary map, where the value is 1 if the ally pawn or the enemy pawn is aiming, otherwise 0. This layer
-helps the agent determine whether to interrupt the aiming process of both parties.
-
-=== Status layer
-A binary map, where the value is 1 if the ally or enemy pawn is paralyzed, otherwise 0. 
-
-=== Danger layer
-A discrete map, where the value is 0-100, representing the danger level of both parties. The specific calculation
-of danger value will be elaborated in the reward function section.
-
-=== Frame Stack
-The 6 layers present the current game state, however, in actual combating, the agent needs information through the timeline to make a better decision.
-
-Therefore, the observation space is stacked per 8 frames, making the observation space 6x15x15x8, those frames are viewed as the depth dimension.
+=== Featurization
+To capture the features of a protein-ligand complex, Sfcnn uses the method of grid mapping and one-hot encoding.
+Each complex is mapped to a 3D grid with resolution 20 $times$ 20 $times$ 20, which is later
+transformed into a 4D tensor. Each cell within the grid is a formed by an encoding list of length 28, consists of 
+14 protein atom(isotope)#footnote[Please refer to the original Sfcnn paper for those atom types: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3#availability-of-data-and-materials] 
+and 14 corresponding ligands, mapped with one-hot encoding method.
+The final training tensor size is therefore (48520, 28, 20, 20, 20).
 
 #figure(
-  image("images/paper/obs.jpg", height: 16%, width: 80%, fit: "stretch"),
-  caption: [Single Frame Observation Space Channels],
-) <obs>
+  image("images/one_hot.png", height: 30%, width: 80%,fit: "contain"),
+  caption: [Featurization of the protein–ligand complexes. PDB ID 1a30 is shown as an example. In the default
+case, the resolution of 20×20×20 and 28 categories of atomic types were used],
+) <one_hot>
 
-== Episode Termination
-The episode is terminated if one of the following conditions is met:
-1. A winner is declared.
-2. The maximum step length 800 is reached. In which case, episode reward will be preserved with no change.
 
-== Reward Function
-After each episode is terminated, the episode reward will be calculated and recorded based on the following reward table:
+== Network
+The original paper presents 4 different network structures along with 3 ways of featurization. The network shown in the figure, 
+combing with the featurization method above achieved best performance on validation set.
+#figure(
+  image("images/CNN.png", height: 30%, width: 60%,fit: "contain"),
+  caption: [Final CNN structure for Sfcnn network],
+) <CNN>
+This network features 3D convolution layers with batch normalization and ReLU activation.L2 regularization was applied on the output layer to reduce the probability of overfitting and improve generalization.
+
+
+
+= Reproduction
+
+
 
 #tablefig(
   table(
@@ -325,10 +285,10 @@ distribution is obtained by applying a softmax function to the combined
 output.
 
 
-#figure(
-  image("images/paper/dqn.jpg", fit: "stretch"),
-  caption: [DQN Model Structure],
-) <dqn_model>
+// #figure(
+//   image("images/paper/dqn.jpg", fit: "stretch"),
+//   caption: [DQN Model Structure],
+// ) <dqn_model>
 
 == Action
 
@@ -399,10 +359,10 @@ This dynamic prioritization allows the agent to focus on the most informative ex
 The DQN agent is trained with 1,000,000 steps, the recorded
 inner parameter curve is shown in the following figure:
 
-#figure(
-  image("images/paper/dqn_loss.png", fit: "contain"),
-  caption: [Loss Curve],
-) <loss_curve>
+// #figure(
+//   image("images/paper/dqn_loss.png", fit: "contain"),
+//   caption: [Loss Curve],
+// ) <loss_curve>
 
 The detailed training reward and actual tactical development of the agent will 
 be shown in the result comparison section.
@@ -431,10 +391,10 @@ The critic block is responsible for the state value estimation, which consists o
 The output state value will be used for advantage calculation in the update step.
 
 
-#figure(
-  image("images/paper/ppo.jpg", fit: "contain"),
-  caption: [PPO Model Structure],
-) <ppo_model>
+// #figure(
+//   image("images/paper/ppo.jpg", fit: "contain"),
+//   caption: [PPO Model Structure],
+// ) <ppo_model>
 
 
 == Action  
@@ -548,10 +508,10 @@ where $L$ is the total loss, $c_c$ is the critic coefficient.
 The PPO agent is trained with 1,000,000 steps, the recorded
 loss curve is shown in the following figure:
 
-#figure(
-  image("images/paper/ppo_loss.png", fit: "stretch"),
-  caption: [Loss Curve],
-) <loss_curve>
+// #figure(
+//   image("images/paper/ppo_loss.png", fit: "stretch"),
+//   caption: [Loss Curve],
+// ) <loss_curve>
 
 The detailed training reward and actual tactical development of the agent will 
 be shown in the result comparison section.
@@ -573,10 +533,10 @@ The structure of the convolution block is the same as the DQN convolution block 
 === Actor block
 Similar to the PPO actor block mentioned in the previous section, the actor block is responsible for the action sampling of the agent, which consists of two Linear ReLU layers and a full connected layer.
 
-#figure(
-  image("images/paper/pgm.jpg", fit: "stretch"),
-  caption: [PGM Model Structure],
-) <pgm_model>
+// #figure(
+//   image("images/paper/pgm.jpg", fit: "stretch"),
+//   caption: [PGM Model Structure],
+// ) <pgm_model>
 
 == Action
 
@@ -631,10 +591,10 @@ Notice that in practice, the entropy coefficient is set to 0.05.
 == Training Results
 The PGM agent is trained with 120,000 steps since it converged with extremely high speed. The recorded loss curve is shown in the following figure:
 
-#figure(
-  image("images/paper/pgm_loss.png", fit: "stretch"),
-  caption: [Loss Curve],
-) <loss_curve>
+// #figure(
+//   image("images/paper/pgm_loss.png", fit: "stretch"),
+//   caption: [Loss Curve],
+// ) <loss_curve>
 
 The detailed training reward and actual tactical development of the agent will be shown in the result comparison section.
 
@@ -655,61 +615,61 @@ The original code of the paper is open-sourced on github, the link and contribut
 
 Contribution History:
 
-#figure(
-  image("images/paper/server-contrib.png", height: 18%, width: 80%, fit: "stretch"),
-  caption: [Server Contribution],
-) <server_contrib>
+// #figure(
+//   image("images/paper/server-contrib.png", height: 18%, width: 80%, fit: "stretch"),
+//   caption: [Server Contribution],
+// ) <server_contrib>
 
 === Paper https://github.com/zivmax/rimworld-combat-agent-paper/graphs/contributors
 
 Contribution History:
 
-#figure(
-  image("images/paper/paper-contrib.png", height: 18%, width: 80%,fit: "stretch"),
-  caption: [Paper Contribution],
-) <paper_contrib>
+// #figure(
+//   image("images/paper/paper-contrib.png", height: 18%, width: 80%,fit: "stretch"),
+//   caption: [Paper Contribution],
+// ) <paper_contrib>
 
 === RimWorld Mod https://github.com/zivmax/rimworld-combat-agent-client
 
 Contribution History:
 
-#figure(
-  image("images/paper/client-contrib.png", height: 18%, width: 80%,fit: "stretch"),
-  caption: [Client Contribution],
-) <client_contrib>
+// #figure(
+//   image("images/paper/client-contrib.png", height: 18%, width: 80%,fit: "stretch"),
+//   caption: [Client Contribution],
+// ) <client_contrib>
 
-The contributors are:
+// The contributors are:
 
-- zivmax: Linzheng Tang 
-- mike2367: Guo Yu 
+// - zivmax: Linzheng Tang 
+// - mike2367: Guo Yu 
 
-= Acknowledgement
+// = Acknowledgement
 
-External library usage:
+// External library usage:
 
-=== PyTorch
-[@torch] Neural Networks used in agents are built by both of us from scratch.
+// === PyTorch
+// [@torch] Neural Networks used in agents are built by both of us from scratch.
 
-=== Gymnasium
-[@gymnasium] The training environment is designed and built by both of us based on Gymnasium's vectorized environment from scratch.
+// === Gymnasium
+// [@gymnasium] The training environment is designed and built by both of us based on Gymnasium's vectorized environment from scratch.
 
-=== Viztracer
-[@viztracer] This tracing tool helps us to the performance bottleneck of the agents.
+// === Viztracer
+// [@viztracer] This tracing tool helps us to the performance bottleneck of the agents.
 
-=== Pandas
-[@pandas] This library is used to store and analyze the training data.
+// === Pandas
+// [@pandas] This library is used to store and analyze the training data.
 
-=== Numpy
-[@numpy] This library is used to store and process the training data.
+// === Numpy
+// [@numpy] This library is used to store and process the training data.
 
-=== Matplotlib
-[@matplotlib] This library is used to plot the training loss curve.
+// === Matplotlib
+// [@matplotlib] This library is used to plot the training loss curve.
 
 
-Notice that due to legal issues, we can't provide the original version of the game which we purchased. If you are interested in recurring the training process, please purchase the genuine game from https://rimworldgame.com/.
+// Notice that due to legal issues, we can't provide the original version of the game which we purchased. If you are interested in recurring the training process, please purchase the genuine game from https://rimworldgame.com/.
 
-// Display bibliography.
-#bibliography("refs.bib") 
+// // Display bibliography.
+// #bibliography("src\paper\refs.bib") 
 
 
 
