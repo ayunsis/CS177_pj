@@ -63,7 +63,7 @@ Each complex is mapped to a 3D grid with resolution 20 $times$ 20 $times$ 20, wh
 transformed into a 4D tensor. Each cell within the grid is a formed by an encoding list of length 28, consists of 
 14 protein atom(isotope)#footnote[Please refer to the original Sfcnn paper for those atom types: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3#availability-of-data-and-materials] 
 and 14 corresponding ligands, mapped with one-hot encoding method.
-The final training tensor size is therefore (48520, 28, 20, 20, 20).
+The final training tensor size is therefore (48520, 20, 20, 20, 28).
 
 #figure(
   image("images/one_hot.png", height: 30%, width: 80%,fit: "contain"),
@@ -85,68 +85,53 @@ This network features 3D convolution layers with batch normalization and ReLU ac
 
 = Reproduction
 
+== Data Method
+
+=== Dataset and Featurization
+The reproduction pipeline uses the same dataset and featurization method, results in training 4D tensor, shaped (48520, 20, 20, 20, 28)
+testing 4D tensor, shaped (285, 20, 20, 20, 28).
+
+=== Data storage
+It is worth noting that the original Sfcnn data storage uses the format
+of .pkl (pickle file), which features concatenate the full arrays first, then dump into the file at once. This approach requires to store and dispatch all the complexes' information within local memory,
+which would cause an extremely high memory consumptiondue to the high
+training data volume and is unfeasible on normal computers.
+
+In alternative, our team switched to the format .h5 (h5py file), which
+supports instant writing and solve the issue, resulting in 40.1 GiB training grid.
+
+== Network
+
+=== Structure
+The pytorch network structure is similar with the original tensorflow version except for 
+two main difference: 
+- 1.Due to the Conv3D API requirement in pytorch, the input 4D tensor shape is permuted to (batch_size, 28, 20, 20, 20)
+
+- 2.Pytorch lacks direct L2 regularization API, the final linear layer in the fully connected part is therefore set a weight decay to imitate the effect.
+
+=== Training 
 
 
-#tablefig(
-  table(
-    columns: 3,
-    align: center + horizon,
-    stroke: none,
-    inset: 3pt,
-    [Reward Type], [Enemy], [Ally],
-    table.hline(),
-    [Original], [/], [0],
-    [Win], [-50], [+50],
-    [Danger], [+200], [-200],
-    [Invalid Action], [/], [-0.25],
-    [Distance], [/], [±0.1],
-    [Cover], [/], [+0.15],
-    table.hline(),
-  ),
-  caption: [Reward Settings],
-) <reward_settings>
-
-Notice that only the currently in use rewards are given in the table, other rewards such as ally remain still penalty are designed but deprecated, their coefficients are set to 0.
-
-=== Win
-If a winner is declared and it is the ally, the ally will be rewarded 50 points, otherwise it will be penalized 50 points.
+// #tablefig(
+//   table(
+//     columns: 3,
+//     align: center + horizon,
+//     stroke: none,
+//     inset: 3pt,
+//     [Reward Type], [Enemy], [Ally],
+//     table.hline(),
+//     [Original], [/], [0],
+//     [Win], [-50], [+50],
+//     [Danger], [+200], [-200],
+//     [Invalid Action], [/], [-0.25],
+//     [Distance], [/], [±0.1],
+//     [Cover], [/], [+0.15],
+//     table.hline(),
+//   ),
+//   caption: [Reward Settings],
+// ) <reward_settings>
 
 
-=== Danger  
-The original paralyzing mechanism in the game is calculated through a linear piecewise function regarding the pawn's consciousness, pain and blood loss stage. 
-
-In actual calculations, to unify the computing system, the paralyzing danger degree is defined as follows:
-
-$
-d = 1 / (1 + exp(5 + c - p - b))
-$ <danger_formula>
-
-where $c$ is the pawn's consciousness proportion, $p$ is the pawn's pain proportion and $b$ is the pawn's blood loss proportion, they are
-floats ranging from 0 to 1. 
-
-The danger value is mapped to (0, 1) with 2 decimal places by sigmoid function. When the value is greater than 0.75, the pawn will be paralyzed. The corresponding reward is calculated by the difference equation:
-
-$
-r_d = c_d dot.c (d_(n+1) - d_n)
-$ <danger_reward>
-
-where $r_d$ is the danger reward , $c_d$ is the danger reward coefficient, $d_(n+1)$ is the danger value of the current step, $d_n$ is the danger value of the previous step.
-
-Notice that the paralyzing danger degree is calculated separately from the game's 
-internal paralyzing mechanism, and when passed to the Danger layer, it is 
-mapped to an integer within (0, 100).
-
-=== Invalid Action
-When the ally pawn tries to move to a position that is blocked by walls or outside its action space, the action is deemed invalid.
-
-Invalid coordinates will be clipped to the action space and reward will be penalized $c_i$ points, where $c_i$ is the invalid action coefficient.
-
-=== Distance
-The ally pawn tends to perform better when it keeps certain distance from the enemy pawn. In practice, the optimal distance is set to 5 with a slack 
-range of 1 grid. Once the ally is out of the optimal distance range, the reward will be penalized $c_d$ points, otherwise the reward will be added $c_d$ points.
-
-=== Cover
-The ally is encouraged to take cover behind walls or trees and hide from the enemy's straight shot. The action space of ally is divided into north-east, north-west, south-east and south-west quadrants, the quadrant closest to the enemy is activated, every cover within such quadrant will be rewarded $c_c$ points, where $c_c$ is the cover reward coefficient.
 
 
 = Deep-Q-learning
