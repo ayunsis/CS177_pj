@@ -67,7 +67,7 @@ Each complex is mapped to a 3D grid with resolution 20 $times$ 20 $times$ 20, wh
 transformed into a 4D tensor. Each cell within the grid is a formed by an encoding list of length 28, consists of 
 14 protein atom(isotope)#footnote[Please refer to the original Sfcnn paper for those atom types: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3#availability-of-data-and-materials] 
 and 14 corresponding ligands, mapped with one-hot encoding method.
-The final training tensor size is therefore (48520, 20, 20, 20, 28).
+The final training tensor size is therefore *(48520, 20, 20, 20, 28)*.
 
 #figure(
   image("images/one_hot.png", height: 30%, width: 80%,fit: "contain"),
@@ -92,8 +92,8 @@ This network features 3D convolution layers with batch normalization and ReLU ac
 == Data Method
 
 === Dataset and Featurization
-The reproduction pipeline uses the same dataset and featurization method, results in training 4D tensor, shaped (48520, 20, 20, 20, 28)
-testing 4D tensor, shaped (285, 20, 20, 20, 28).
+The reproduction pipeline uses the same dataset and featurization method, results in training 4D tensor, shaped *(48520, 20, 20, 20, 28)*,
+testing 4D tensor, shaped *(285, 20, 20, 20, 28)*.
 
 === Data Storage
 It is worth noting that the original Sfcnn data storage uses the format
@@ -101,21 +101,21 @@ of .pkl (pickle file), which features concatenate the full arrays first, then du
 which would cause an extremely high memory consumptiondue to the high
 training data volume and is unfeasible on normal computers.
 
-In alternative, our team switched to the format .h5 (h5py file), which
-supports instant writing and solve the issue, resulting in 40.1 GiB training grid.
+In alternative, our team switched to the format *.h5 (h5py file)*, which
+supports instant writing and solves the issue, resulting in 40.1 GiB training grid.
 
 == Network
 
 === Structure
 The pytorch network structure is similar to the original tensorflow version except for two main difference: 
-- 1.Due to the Conv3D API requirement in pytorch, the input 4D tensor shape is permuted to (batch_size, 28, 20, 20, 20)
+- 1.Due to the Conv3D API requirement in pytorch, the input 4D tensor shape is permuted to (batch_size, 28, 20, 20, 20).
 
 - 2.Pytorch lacks direct L2 regularization API, the final linear layer in the fully connected part is therefore set a weight decay to imitate the effect.
 
 === Training 
 The training process is performed on training set and validation set, the 
 validation set is partitioned from the training 4D tensor, indexed from 41000
-to 48520, same as the original network. The final training set shape: (41000, 20, 20, 20, 28), validation set shape: (7520, 20, 20, 20, 28), the final dataset ratio is train : validation : test = 84.00% : 15.42% : 0.58%
+to 48520, same as the original network. The final training set shape: *(41000, 20, 20, 20, 28)*, validation set shape: *(7520, 20, 20, 20, 28)*, the final dataset ratio is train : validation : test = *84.00% : 15.42% : 0.58%*
 
 Notice that the original training hyperparameters failed to converge in our experiments on the pytorch network, both the original hyperparameter and our current hyperparameter choice are presented in the following table:
 #tablefig(
@@ -126,9 +126,9 @@ Notice that the original training hyperparameters failed to converge in our expe
     inset: 3pt,
     [Param], [Original], [Reproduced],
     table.hline(),
-    [lr(learning rate)], [0.004], [0.002],
-    [batch size], [64], [32],
-    [dropout rate], [0.5], [0.15],
+    [*lr(learning rate)*], [*0.004*], [*0.002*],
+    [*batch size*], [*64*], [*32*],
+    [*dropout rate*], [*0.5*], [*0.15*],
     [L2 regularization/FC weight decay], [0.01], [0.01],
     [epochs], [200], [200],
     table.hline(),
@@ -169,7 +169,7 @@ The result is shown in the following table:
     inset: 3pt,
     [Metrics], [Reproduced Sfcnn], [Original Sfcnn],
     table.hline(),
-    [Pearson R], [0.7286], [0.7928],
+    [*Pearson R*], [*0.7286*], [*0.7928*],
     [RMSE], [1.5481], [1.3263],
     [MAE], [1.2579], [1.0277],
     [SD], [1.4892], [1.3252],
@@ -180,7 +180,7 @@ The result is shown in the following table:
 
 Notice that despite the original sfcnn presents better score in all the metrics, its performance is doubtful since its reproduced training process did not reach convergence.
 
-Due to the data storage mentioned above and the author's failure to respond the request raised by another individual of providing the original (.pkl) training set on github#footnote[https://github.com/bioinfocqupt/Sfcnn/issues/1], the original training process is irreproducible.
+Due to the data storage mentioned above and the author's failure to respond the request raised by another individual of providing the original (.pkl) training set on github#footnote[https://github.com/bioinfocqupt/Sfcnn/issues/1], *the original training process is irreproducible*.
 
 The training curves are presented below as comparison.
 
@@ -195,16 +195,15 @@ The training curves are presented below as comparison.
 ) <OriginalPlot>
 
 After discussing with the teaching assistant, our team will 
-take the reproduced(convergent) result as the normal performance of the Sfcnn network and will apply it to the next part of AlphaFold3 result assessing.
+take the *reproduced(convergent) result* as the normal performance of the Sfcnn network and will apply it to the next part of AlphaFold3 result assessing.
 
 = AlphaFold3 Predictions
 
 == Dataset
 
-The assessment dataset used is the CASF-2016 core set mentioned
-above except for 6 specific proteins with overly complex structure for AlphaFold3 to make useful predictions, resulting in total 279 proteins.
+The assessment dataset used is the CASF-2016 core set mentioned above except for 6 specific proteins with overly complex structure for AlphaFold3 to make useful predictions, resulting in total *279* proteins.
 
-Each of those proteins is excluded because of more than 5 Isomorphic/Heterogeneous Chains, those proteins are listed below:
+Proteins with more than 5 Isomorphic/Heterogeneous Chains are deemed too complex and excluded, those proteins are listed below:
 
 #tablefig(
   table(
@@ -225,7 +224,24 @@ Each of those proteins is excluded because of more than 5 Isomorphic/Heterogeneo
   caption: [6 complex protein structures],
 ) <hyperparams>
 
+== Generation Pipeline
+
+=== Online Server 
+Each protein structure is generated manually on the 
+*Chai-1 online server* #footnote[https://lab.chaidiscovery.com/dashboard] instead of the AlphaFold3 online server #footnote[https://alphafoldserver.com/] because it doesn't allow specific ligand SMILES(Simplified Molecular Input Line Entry System) code. The MSA(Multiple Sequence Alignment) option is 
+selected with algorithm *MMseqs2* for each generation.
+
+=== Docking
+Results generated on the server will be downloaded as zip files, each contains multiple scoring ranks and detailed metrics. Structure file with the highest rank (pred.rank_0.cif) will be used as the model result for assessment.
+
+To avoid the potential issues in converting .cif files#footnote[Crystallographic Information File] to .pdb#footnote[Protein Data Bank] and .mol2#footnote[Tripos molecule structure format] files, the structure files are parsed using the *MMCIFParser* provided in python library Bio.PDB, then go through the featurization and grid mapping process directly.
+
+=== Scoring 
+The testing grid for predicted structures are scored using the reproduced network, loaded with the pre-trained weight which 
+shows the above performance(pearson 0.728). Detailed analysis of the PLA result and metrics will be analyzed in the following section.  
+
 // External library usage:
+
 
 // === PyTorch
 // [@torch] Neural Networks used in agents are built by both of us from scratch.
