@@ -3,7 +3,11 @@
 // Template for IFAC meeting papers
 //
 // Adapted from ifacconf.tex by Juan a. de la Puente
-//==============================================================================
+//============================================================================
+#let leading = 1.2em
+#set block(spacing: leading)
+#set par(spacing: leading)
+#set par(leading: leading)
 
 #import "@preview/abiding-ifacconf:0.1.0": *
 #show: ifacconf-rules
@@ -191,8 +195,35 @@ The training curves are presented below as comparison.
 ) <OriginalPlot>
 
 After discussing with the teaching assistant, our team will 
-take the reproduced(convergent) result as the normal performance of the Sfcnn network and will apply it to 
-the next part of AlphaFold3 result assessing.
+take the reproduced(convergent) result as the normal performance of the Sfcnn network and will apply it to the next part of AlphaFold3 result assessing.
+
+= AlphaFold3 Predictions
+
+== Dataset
+
+The assessment dataset used is the CASF-2016 core set mentioned
+above except for 6 specific proteins with overly complex structure for AlphaFold3 to make useful predictions, resulting in total 279 proteins.
+
+Each of those proteins is excluded because of more than 5 Isomorphic/Heterogeneous Chains, those proteins are listed below:
+
+#tablefig(
+  table(
+    columns: 2,
+    align: center + horizon,
+    stroke: none,
+    inset: 3pt,
+    [PDB ID], [Isomorphic/Heterogeneous Chains], 
+    table.hline(),
+    [2xb8], [12],
+    [2ymd], [10],
+    [3n76], [12], 
+    [3n7a], [12], 
+    [3n86], [12], 
+    [4ciw], [12],
+    table.hline(),
+  ),
+  caption: [6 complex protein structures],
+) <hyperparams>
 
 // External library usage:
 
