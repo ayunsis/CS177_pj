@@ -91,7 +91,7 @@ This network features 3D convolution layers with batch normalization and ReLU ac
 The reproduction pipeline uses the same dataset and featurization method, results in training 4D tensor, shaped (48520, 20, 20, 20, 28)
 testing 4D tensor, shaped (285, 20, 20, 20, 28).
 
-=== Data storage
+=== Data Storage
 It is worth noting that the original Sfcnn data storage uses the format
 of .pkl (pickle file), which features concatenate the full arrays first, then dump into the file at once. This approach requires to store and dispatch all the complexes' information within local memory,
 which would cause an extremely high memory consumptiondue to the high
@@ -111,7 +111,7 @@ The pytorch network structure is similar to the original tensorflow version exce
 === Training 
 The training process is performed on training set and validation set, the 
 validation set is partitioned from the training 4D tensor, indexed from 41000
-to 48520, same as the original network. The final training set shape: (41000, 20, 20, 20, 28), validation set shape: (7520, 20, 20, 20, 28), the final dataset ratio is train : validation : test = 84.0% : 15.4% : 0.58%
+to 48520, same as the original network. The final training set shape: (41000, 20, 20, 20, 28), validation set shape: (7520, 20, 20, 20, 28), the final dataset ratio is train : validation : test = 84.00% : 15.42% : 0.58%
 
 Notice that the original training hyperparameters failed to converge in our experiments on the pytorch network, both the original hyperparameter and our current hyperparameter choice are presented in the following table:
 #tablefig(
@@ -173,6 +173,27 @@ The result is shown in the following table:
   ),
   caption: [Performance Metrics Comparison on CASF-2016 Core Set],
 ) <metrics_comparison>
+
+Notice that despite the original sfcnn presents better score in all the metrics, its performance is doubtful since its reproduced training process did not reach convergence.
+
+Due to the data storage mentioned above and the author's failure to respond the request raised by another individual of providing the original (.pkl) training set on github#footnote[https://github.com/bioinfocqupt/Sfcnn/issues/1], the original training process is irreproducible.
+
+The training curves are presented below as comparison.
+
+#figure(
+  image("images/normal_converge.png", height: 22%, width: 95%,fit: "contain"),
+  caption: [Training process for Reproduced Parameters],
+) <ReproducedPlot>
+
+#figure(
+  image("images/origin_param.png", height: 22%, width: 90%,fit: "contain"),
+  caption: [Training process for Original Parameters],
+) <OriginalPlot>
+
+After discussing with the teaching assistant, our team will 
+take the reproduced(convergent) result as the normal performance of the Sfcnn network and will apply it to 
+the next part of AlphaFold3 result assessing.
+
 // External library usage:
 
 // === PyTorch
