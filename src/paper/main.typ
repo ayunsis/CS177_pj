@@ -224,7 +224,7 @@ Proteins with more than 5 Isomorphic/Heterogeneous Chains are deemed too complex
   caption: [6 complex protein structures],
 ) <hyperparams>
 
-== Generation Pipeline
+== Pipeline
 
 === Online Server 
 Each protein structure is generated manually on the 
@@ -236,9 +236,12 @@ Results generated on the server will be downloaded as zip files, each contains m
 
 To avoid the potential issues in converting .cif files#footnote[Crystallographic Information File] to .pdb#footnote[Protein Data Bank] and .mol2#footnote[Tripos molecule structure format] files, the structure files are parsed using the *MMCIFParser* provided in python library Bio.PDB, then go through the featurization and grid mapping process directly.
 
+Notice that in the results of AF3, certain atoms or isotopes are not included in the 14 pre-set atom types, those atoms will be included in the *`other`* part of the pre-set types.
+
 === Scoring 
 The testing grid for predicted structures are scored using the reproduced network, loaded with the pre-trained weight which 
 shows the above performance(pearson 0.728). Detailed analysis of the PLA result and metrics will be analyzed in the following section.  
+
 
 // External library usage:
 
