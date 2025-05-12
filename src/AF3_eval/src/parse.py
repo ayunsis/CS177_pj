@@ -75,15 +75,6 @@ plt.legend()
 plt.tight_layout()
 plt.savefig('src/AF3_eval/outputs/img/gap_histogram.png', dpi=300)
 
-plt.figure(figsize=(10, 6))
-plt.scatter(core2016_df['gap'], sfcnn_df['gap'], alpha=0.7)
-plt.title('Scatter Plot: core2016 gap vs sfcnn gap')
-plt.xlabel('core2016 gap')
-plt.ylabel('sfcnn gap')
-plt.grid()
-plt.tight_layout()
-plt.savefig('src/AF3_eval/outputs/img/gap_scatter.png', dpi=300)
-
 
 plt.figure(figsize=(10, 6))
 gap_df = pd.DataFrame({
@@ -108,3 +99,28 @@ plt.grid()
 plt.tight_layout()
 plt.savefig('src/AF3_eval/outputs/img/gap_correlation.png', dpi=300)
 
+plt.figure(figsize=(10, 6))
+sns.violinplot(data=gap_df, palette='plasma', alpha=0.6)
+plt.title('Violin Plot of Gaps')
+plt.ylabel('Gap')
+plt.grid()
+plt.tight_layout()
+plt.savefig('src/AF3_eval/outputs/img/gap_violinplot.png', dpi=300)
+
+means = (core2016_df['gap'] + sfcnn_df['gap']) / 2
+diffs = core2016_df['gap'] - sfcnn_df['gap']
+mean_diff = diffs.mean()
+std_diff = diffs.std()
+
+plt.figure(figsize=(10, 6))
+plt.scatter(means, diffs, alpha=0.6)
+plt.axhline(mean_diff, color='red', linestyle='--', label='Mean difference')
+plt.axhline(mean_diff + 1.96*std_diff, color='purple', linestyle='--', label='±1.96 SD')
+plt.axhline(mean_diff - 1.96*std_diff, color='purple', linestyle='--')
+plt.title('Bland-Altman Plot')
+plt.xlabel('Mean Gap')
+plt.ylabel('Difference in Gap')
+plt.legend()
+plt.grid()
+plt.tight_layout()
+plt.savefig('src/AF3_eval/outputs/img/bland_altman.png', dpi=300)
