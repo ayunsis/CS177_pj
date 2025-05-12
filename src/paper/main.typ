@@ -194,7 +194,7 @@ The training curves are presented below as comparison.
   caption: [Training process for Original Parameters],
 ) <OriginalPlot>
 
-After discussing with the teaching assistant, our team will 
+After discussion, our team will 
 take the *reproduced(convergent) result* as the normal performance of the Sfcnn network and will apply it to the next part of AlphaFold3 result assessing.
 
 = AlphaFold3 Predictions
