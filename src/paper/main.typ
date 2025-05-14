@@ -126,7 +126,7 @@ Notice that the original training hyperparameters failed to converge in our expe
     inset: 3pt,
     [Param], [Original], [Reproduced],
     table.hline(),
-    [*lr(learning rate)*], [*0.004*], [*0.002*],
+    [*lr(learning rate)*], [*0.004*], [*0.0015*],
     [*batch size*], [*64*], [*32*],
     [*dropout rate*], [*0.5*], [*0.15*],
     [L2 regularization/FC weight decay], [0.01], [0.01],

@@ -64,7 +64,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.002, type=float)
+    parser.add_argument('--lr', default=0.0015, type=float)
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
