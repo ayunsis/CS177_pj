@@ -163,3 +163,4 @@ if __name__ == '__main__':
     study.optimize(objective, n_trials=30)
     print("Best trial:")
     print(study.best_trial)
+    print("Best parameters:", study.best_trial.params)
