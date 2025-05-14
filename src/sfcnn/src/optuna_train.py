@@ -130,7 +130,7 @@ def objective(trial):
     criterion = nn.MSELoss()
 
     best_test_pearson = -1.0
-    EPOCHS = 50  # Use fewer epochs for tuning
+    EPOCHS = 100  
 
     for epoch in range(1, EPOCHS+1):
         model.train()
