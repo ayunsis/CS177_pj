@@ -8,7 +8,6 @@ from sklearn import linear_model
 import optuna
 from tqdm import tqdm
 
-# --- Dataset class (copied from train.py) ---
 class HDF5GridDataset(torch.utils.data.Dataset):
     def __init__(self, h5_path, data_key, label_path=None, label_key=None, indices=None, normalize_y=15.0):
         self.h5_path = h5_path
@@ -33,7 +32,6 @@ class HDF5GridDataset(torch.utils.data.Dataset):
         else:
             return grid
 
-# --- Model class (copied from train.py) ---
 class CNN3D(nn.Module):
     def __init__(self, dropout=0.5):
         super().__init__()
@@ -130,9 +128,9 @@ def objective(trial):
     criterion = nn.MSELoss()
 
     best_test_pearson = -1.0
-    EPOCHS = 100  
+    EPOCHS = 70
 
-    for epoch in range(1, EPOCHS+1):
+    for epoch in tqdm(range(1, EPOCHS + 1), desc="Epochs"):
         model.train()
         for xb, yb in tqdm(train_loader, desc=f"Epoch {epoch} Training", leave=False):
             xb, yb = xb.to(device), yb.to(device)
@@ -160,7 +158,7 @@ def objective(trial):
 
 if __name__ == '__main__':
     study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials=30)
+    study.optimize(objective, n_trials=10)
     print("Best trial:")
     print(study.best_trial)
     print("Best parameters:", study.best_trial.params)
