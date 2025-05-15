@@ -2,6 +2,8 @@
 
 \documentclass[unnumsec,webpdf,contemporary,large]{oup-authoring-template}
 \usepackage{booktabs}
+\usepackage{placeins}
+\usepackage{float}
 
 \theoremstyle{thmstyleone}%
 \newtheorem{theorem}{Theorem}%
@@ -16,33 +18,28 @@
 
 \journaltitle{Journal Title Here}
 \DOI{DOI HERE}
-\copyrightyear{2022}
-\pubyear{2019}
-\access{Advance Access Publication Date: Day Month Year}
+\copyrightyear{2025}
+\pubyear{2025}
 \appnotes{Paper}
 
 \firstpage{1}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0em}
 
 \title[Short Article Title]{Assessing the Reliability of AlphaFold3 Predictions for Protein-Ligand Affinity Prediction via Sfcnn}
 
-\author[1]{Guo Yu \thanks{Student ID: 2022533074}}
-\author[1]{Yiming Wu \thanks{Student ID: 2023591024}}
-\author[1]{Yiyang Tan \thanks{Student ID: 2023533142}}
+\author[1]{Guo Yu}
+\author[1]{Yiming Wu}
+\author[1]{Yiyang Tan}
 
 \authormark{Guo Yu et al.}
 
-\address[1]{\orgdiv{School of Information Science and Technology}, \orgname{ShanghaiTech University}, \orgaddress{\street{393 Middle Huaxia Road}, \postcode{201210}, \state{Shanghai}, \country{China}}}
-
-
-
+\address[1]{\orgdiv{School of Information Science and Technology}, 
+\orgname{ShanghaiTech University}, 
+\orgaddress{\street{393 Middle Huaxia Road}, \postcode{201210}, \state{Shanghai}, \country{China}}}
 
 \abstract{
-This project investigates the reliability of using AlphaFold3 (AF3)-predicted 
-structures as an alternative. Sfcnn, a 3D-CNN based protein-ligand affinity prediction model, 
-is reproduced using PyTorch, and its performance is validated on the PDBbind v2019 refined set 
-for training and the CASF-2016 core set for testing. The AF3-derived protein structures of 
-CASF-2016 core set are then evaluated and compared against the groundtruth and Sfcnn scores 
-on the core set to assess the viability of AF3 predictions in PLA tasks.
+This study evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. We reproduce the Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, using PyTorch. Model performance is validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. Subsequently, AF3-derived protein structures from the CASF-2016 core set are assessed and compared to ground truth structures using Sfcnn scores, to determine the suitability of AF3 predictions in PLA applications.
 }
 \keywords{AlphaFold3, protein-ligand affinity, CNN scoring function, CASF-2016}
 
@@ -50,97 +47,90 @@ on the core set to assess the viability of AF3 predictions in PLA tasks.
 
 \section{Introduction}
 
-\subsection{Sfcnn Background}
-Sfcnn is a 3D convolutional neural network based scoring function model proposed in 2022, 
-which aims to provide accurate and reliable scores for binding affinities of protein-ligand 
-complexes.
+\subsection{Sfcnn Overview}
+\vspace{0.5em}
+Sfcnn is a 3D convolutional neural network-based 
+scoring function introduced in 2022 by Wang et al\footnote{\url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3}}, 
+designed to provide accurate and reliable predictions of binding affinities for protein-ligand complexes.
 
-\section{Data Methods}
+\section{Methods}
 
-\subsection{Dataset}
-The Sfcnn network was trained with protein-ligand complexes from the refined set of the PDBbind database version 2019, 
-which contains protein-ligand complexes and their corresponding binding affinities expressed with pKa values. 
-The trained network is later tested on the CASF-2016 core set, which has 285 protein-ligand complexes.
+\subsection{Datasets}
+\vspace{0.5em}
+The Sfcnn network was trained using protein-ligand complexes from the PDBbind v2019 refined set, which includes experimentally determined binding affinities (pKa values). The model was evaluated on the CASF-2016 core set, comprising 285 protein-ligand complexes. To prevent data leakage, 266 overlapping protein complexes between the training and test sets were excluded, resulting in 4,852 unique training complexes.
 
-Note that the overlaps between train set and test set (266 protein complexes) are excluded, 
-leaving 4852 train complexes in total.
-
-\subsection{Augmentation}
-To scale up the training set, each protein-ligand complex is rotated randomly for 9 times 
-using random rotation matrices. Those 10 complexes should bear the same PLA 
-(protein-ligand affinity) score, resulting in total 48520 complexes for training.
+\subsection{Data Augmentation}
+\vspace{0.5em}
+To increase the effective size of the training set, each protein-ligand complex was randomly rotated nine times using random rotation matrices, yielding ten variants per complex. All variants share the same PLA score, resulting in a total of 48,520 training samples.
 
 \subsection{Featurization}
-To capture the features of a protein-ligand complex, Sfcnn uses the method of grid 
-mapping and one-hot encoding. Each complex is mapped to a 3D grid with 
-resolution $20 \times 20 \times 20$, which is later transformed into a 4D tensor. 
-Each cell within the grid is formed by an encoding list of length 28, 
-consisting of 14 protein atom types\footnote{Please refer to the original Sfcnn paper 
-for those atom types: \url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3\#availability-of-data-and-materials}} and 14 corresponding ligands, mapped with one-hot encoding method. The final training tensor size is therefore $(48520, 20, 20, 20, 28)$.
+\vspace{0.5em}
+Protein-ligand complexes are represented as 3D grids of size $20 \times 20 \times 20$, with each grid cell encoded as a one-hot vector of length 28. This vector comprises 14 protein atom types\footnote{Visit the original Sfcnn publication for atom type definitions} and 14 ligand atom types. The resulting training tensor has shape $(48520, 20, 20, 20, 28)$.
 
-\begin{figure}[!t]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/one_hot.png}
-    \caption{Featurization of the protein-ligand complexes. PDB ID 1a30 is shown as an example. In the default case, the resolution of $20\times20\times20$ and 28 categories of atomic types were used.}
+    \caption{Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Default resolution is $20\times20\times20$ with 28 atomic categories.}
     \label{fig:onehot}
 \end{figure}
 
-\section{Network}
+\section{Network Architecture}
 
-The original paper presents 4 different network structures along with 3 ways of featurization. The network shown in the figure, combined with the featurization method above, achieved best performance on validation set.
+The original Sfcnn publication describes four network architectures and three featurization strategies. The architecture depicted in Figure~\ref{fig:CNN}, combined with the aforementioned featurization, achieved optimal validation performance.
 
-\begin{figure}[!t]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.35\textwidth]{images/CNN.png}
-    \caption{Final CNN structure for Sfcnn network.}
+    \caption{Final CNN architecture for the Sfcnn network.}
     \label{fig:CNN}
 \end{figure}
 
-This network features 3D convolution layers with batch normalization and ReLU activation. L2 regularization was applied on the output layer to reduce the probability of overfitting and improve generalization.
+This architecture employs 3D convolutional layers with batch normalization and ReLU activation. L2 regularization is applied to the output layer to mitigate overfitting and enhance generalization.
 
-\section{Reproduction}
+\section{Reproduction Study}
 
 \subsection{Dataset and Featurization}
-The reproduction pipeline uses the same dataset and featurization method, resulting in a training 4D tensor shaped $(48520, 20, 20, 20, 28)$ and a testing 4D tensor shaped $(285, 20, 20, 20, 28)$.
+\vspace{0.5em}
+The reproduction pipeline utilizes the same datasets and featurization approach, yielding a training tensor of shape $(48520, 20, 20, 20, 28)$ and a test tensor of shape $(285, 20, 20, 20, 28)$.
 
 \subsection{Data Storage}
-It is worth noting that the original Sfcnn data storage uses the format of .pkl (pickle file), which concatenates the full arrays first, then dumps into the file at once. This approach requires to store and dispatch all the complexes' information within local memory, which would cause extremely high memory consumption due to the high training data volume and is unfeasible on normal computers.
+\vspace{0.5em}
+The original Sfcnn implementation stored data as concatenated arrays in a single \texttt{.pkl} (pickle) file, requiring all data to reside in memory, which is impractical for extremely large datasets. We adopted the \texttt{.h5} (HDF5) format via \texttt{h5py}, enabling incremental writing and efficient storage. The resulting training grid occupies 40.1 GiB.
 
-Alternatively, our team switched to the format \texttt{.h5} (h5py file), which supports instant writing and solves the issue, resulting in a 40.1 GiB training grid.
-
-\subsection{Network Structure}
-The PyTorch network structure is similar to the original TensorFlow version except for two main differences:
+\subsection{Network Implementation}
+\vspace{0.5em}
+The PyTorch implementation closely mirrors the original TensorFlow version, with two key differences:
 \begin{enumerate}
-    \item Due to the Conv3D API requirement in PyTorch, the input 4D tensor shape is permuted to (batch\_size, 28, 20, 20, 20).
-    \item PyTorch lacks a direct L2 regularization API, so the final linear layer in the fully connected part is set with a weight decay to imitate the effect.
+    \item Due to PyTorch's \texttt{Conv3D} API, input tensors are permuted to shape (batch\_size, 28, 20, 20, 20).
+    \item PyTorch lacks a direct L2 regularization API; instead, weight decay is applied to the final fully connected layer to approximate this effect.
 \end{enumerate}
 
-\subsection{Training}
-The training process is performed on training and validation sets. The validation set is partitioned from the training 4D tensor, indexed from 41000 to 48520, same as the original network. The final training set shape: $(41000, 20, 20, 20, 28)$, validation set shape: $(7520, 20, 20, 20, 28)$. The final dataset ratio is train : validation : test = 84.00\% : 15.42\% : 0.58\%.
+\subsection{Training Procedure}
+\vspace{0.5em}
+Training and validation sets are partitioned as in the original study, with the validation set comprising indices 41,000 to 48,520. The resulting splits are: training $(41,000, 20, 20, 20, 28)$, validation $(7,520, 20, 20, 20, 28)$, and test $(285, 20, 20, 20, 28)$, corresponding to a ratio of 84.00\% : 15.42\% : 0.58\%. The original hyperparameters did not yield convergence in our PyTorch experiments; both original and adjusted hyperparameters are summarized in Table~\ref{tab:hyperparams}.
 
-Notice that the original training hyperparameters failed to converge in our experiments on the PyTorch network. Both the original hyperparameters and our current hyperparameter choice are presented in Table~\ref{tab:hyperparams}.
-
-\begin{table}[!t]
+\begin{table}[H]
 \centering
-\caption{Original/Reproduced hyperparameters}
+\caption{Original and Reproduced Hyperparameters}
 \label{tab:hyperparams}
 \begin{tabular}{lcc}
 \toprule
-Param & Original & Reproduced \\
+Parameter & Original & Reproduced \\
 \midrule
-\textbf{lr (learning rate)} & 0.004 & 0.0015 \\
-\textbf{batch size} & 64 & 32 \\
-\textbf{dropout rate} & 0.5 & 0.15 \\
-L2 regularization/FC weight decay & 0.01 & 0.01 \\
-epochs & 200 & 200 \\
+Learning rate & 0.004 & 0.0015 \\
+Batch size & 64 & 32 \\
+Dropout rate & 0.5 & 0.15 \\
+L2 regularization / FC weight decay & 0.01 & 0.01 \\
+Epochs & 200 & 200 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Results}
 
-\subsection{Metrics}
-The performance of Sfcnn is measured by the following four main metrics:
+\subsection{Evaluation Metrics}
+\vspace{0.5em}
+Sfcnn performance is evaluated using the following metrics:
 
 \begin{align*}
 \mathrm{RMSE} &= \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_{\text{predict}} - y_{\text{true}})^2} \\
@@ -149,17 +139,21 @@ The performance of Sfcnn is measured by the following four main metrics:
 \mathrm{R} &= \frac{\mathbb{E}[(y_{\text{predict}} - \mu_{y_{\text{predict}}})(y_{\text{true}} - \mu_{y_{\text{true}}})]}{\sigma_{y_{\text{predict}}} \sigma_{y_{\text{true}}}}
 \end{align*}
 
-where $a$ and $b$ represent the slope and intercept of the linear regression line of the predicted and measured values. $\mathbb{E}[\cdot]$ denotes the expectation. $\mu_{y_{\text{predict}}}$ and $\mu_{y_{\text{true}}}$ are the means, and $\sigma_{y_{\text{predict}}}$ and $\sigma_{y_{\text{true}}}$ are the standard deviations of the predicted and true values, respectively.
+where $a$ and $b$ are the slope and intercept of the linear 
+regression between predicted and measured values, 
+$\mathbb{E}[\cdot]$ denotes expectation, 
+and $\mu$ and $\sigma$ represent means and standard deviations, 
+respectively.
 
-\begin{table}[!t]
+\begin{table}[H]
 \centering
-\caption{Performance Metrics Comparison on CASF-2016 Core Set}
+\caption{Performance Metrics on CASF-2016 Core Set}
 \label{tab:metrics}
 \begin{tabular}{lcc}
 \toprule
-Metrics & Reproduced Sfcnn & Original Sfcnn \\
+Metric & Reproduced Sfcnn & Original Sfcnn \\
 \midrule
-\textbf{Pearson R} & 0.7286 & 0.7928 \\
+Pearson R & 0.7286 & 0.7928 \\
 RMSE & 1.5481 & 1.3263 \\
 MAE & 1.2579 & 1.0277 \\
 SD & 1.4892 & 1.3252 \\
@@ -167,42 +161,48 @@ SD & 1.4892 & 1.3252 \\
 \end{tabular}
 \end{table}
 
-Notice that despite the original Sfcnn presents better scores in all the metrics, its performance is doubtful since its reproduced training process did not reach convergence.
+Although the original Sfcnn reports superior metrics, 
+its training process did not converge in our reproduction, 
+raising concerns about its reported performance. Due to the lack of access to the original training data and the absence of 
+author response to data requests on GitHub\footnote{\url{https://github.com/bioinfocqupt/Sfcnn/issues/1}}, 
+the original training process is deemed irreproducible.
 
-Due to the data storage mentioned above and the author's failure to respond to the request raised by another individual of providing the original (.pkl) training set on GitHub\footnote{\url{https://github.com/bioinfocqupt/Sfcnn/issues/1}}, \textbf{the original training process is irreproducible}.
 
-The training curves are presented below as comparison.
+The training, validation and testing result on the four metrics
+are shown in the figure below.
 
-\begin{figure}[!t]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{images/normal_converge.png}
-    \caption{Training process for Reproduced Parameters}
-    \label{fig:ReproducedPlot}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/normal_converge.png}
+        \caption{Training curve for reproduced hyperparameters.}
+        \label{fig:ReproducedPlot}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/origin_param.png}
+        \caption{Training curve for original hyperparameters.}
+        \label{fig:OriginalPlot}
+    \end{minipage}
 \end{figure}
 
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=0.5\textwidth]{images/origin_param.png}
-    \caption{Training process for Original Parameters}
-    \label{fig:OriginalPlot}
-\end{figure}
 
-After discussion, our team will take the \textbf{reproduced (convergent) result} as the normal performance of the Sfcnn network and will apply it to the next part of AlphaFold3 result assessing.
+The convergent results from our reproduction are considered the baseline for subsequent AF3 assessment.
 
-\section{AlphaFold3 Predictions}
+
+\section{AlphaFold3 Structure Assessment}
 
 \subsection{Dataset}
-The assessment dataset used is the CASF-2016 core set mentioned above except for 6 specific proteins with overly complex structure for AlphaFold3 to make useful predictions, resulting in total \textbf{279} proteins.
+The assessment utilizes the CASF-2016 core set, excluding six proteins with structural complexity beyond AlphaFold3's predictive capacity, resulting in 279 proteins. Proteins with more than five isomorphic or heterogeneous chains were excluded, as detailed in Table~\ref{tab:complex}.
 
-Proteins with more than 5 Isomorphic/Heterogeneous Chains are deemed too complex and excluded. Those proteins are listed below:
-
-\begin{table}[!t]
+\begin{table}[H]
 \centering
-\caption{6 complex protein structures}
+\caption{Excluded Complex Protein Structures}
 \label{tab:complex}
 \begin{tabular}{lc}
 \toprule
-PDB ID & Isomorphic/Heterogeneous Chains \\
+PDB ID & Number of Chains \\
 \midrule
 2xb8 & 12 \\
 2ymd & 10 \\
@@ -214,43 +214,39 @@ PDB ID & Isomorphic/Heterogeneous Chains \\
 \end{tabular}
 \end{table}
 
-\subsection{WorkFlow}
+\subsection{Workflow}
+\vspace{0.5em}
+\paragraph{Structure Generation}
+Protein structures were generated using the \textit{Chai-1 online server}\footnote{\url{https://lab.chaidiscovery.com/dashboard}}. The AlphaFold3 online server\footnote{\url{https://alphafoldserver.com/}} was not used due to its inability to accept specific ligand SMILES codes. The MSA (Multiple Sequence Alignment) option was enabled with the MMseqs2 algorithm for all generations.
 
-\paragraph{Online Server}
-Each protein structure is generated manually on the \textit{Chai-1 online server}\footnote{\url{https://lab.chaidiscovery.com/dashboard}} instead of the AlphaFold3 online server\footnote{\url{https://alphafoldserver.com/}} because it doesn't allow specific ligand SMILES (Simplified Molecular Input Line Entry System) code. The MSA (Multiple Sequence Alignment) option is selected with algorithm \textit{MMseqs2} for each generation.
+\paragraph{Docking and File Handling}
+Server outputs were downloaded as zip archives containing multiple ranked structures and associated metrics. The top-ranked structure (\texttt{pred.rank\_0.cif}) was selected for analysis. To avoid conversion errors between file formats (.cif, .pdb, .mol2), structures were parsed directly using the \texttt{MMCIFParser} from Bio.PDB, followed by featurization and grid mapping.
 
-\paragraph{Docking}
-Results generated on the server are downloaded as zip files, each containing multiple scoring ranks and detailed metrics. The structure file with the highest rank (\texttt{pred.rank\_0.cif}) is used as the model result for assessment.
-
-To avoid potential issues in converting .cif files\footnote{Crystallographic Information File} to .pdb\footnote{Protein Data Bank} and .mol2\footnote{Tripos molecule structure format} files, the structure files are parsed using the \texttt{MMCIFParser} provided in the Python library Bio.PDB, then go through the featurization and grid mapping process directly.
-
-Notice that in the results of AF3, certain atoms or isotopes are not included in the 14 pre-set atom types; those atoms are included in the \texttt{other} part of the pre-set types.
+Note: Atoms or isotopes not included in the 14 predefined atom types are categorized as \texttt{other}.
 
 \paragraph{Scoring}
-The testing grid for predicted structures is scored using the reproduced network, loaded with the pre-trained weight which shows the above performance (Pearson 0.728). Detailed analysis of the PLA result and metrics will be analyzed in the following section.
 
-\section{External Library Usage}
+Predicted structures were scored using the reproduced Sfcnn network, loaded with pre-trained weights (Pearson R = 0.728). Detailed analysis of PLA results and metrics is provided in the subsequent section.
 
-\begin{itemize}
-    \item \textbf{PyTorch}: Neural Networks used in agents are built by both of us from scratch.
-    \item \textbf{Gymnasium}: The training environment is designed and built by both of us based on Gymnasium's vectorized environment from scratch.
-    \item \textbf{Viztracer}: This tracing tool helps us to the performance bottleneck of the agents.
-    \item \textbf{Pandas}: This library is used to store and analyze the training data.
-    \item \textbf{Numpy}: This library is used to store and process the training data.
-    \item \textbf{Matplotlib}: This library is used to plot the training loss curve.
-\end{itemize}
+
 
 \section{Conclusion}
-Some Conclusions here.
+This section will summarize the principal findings and implications of the study. [Please insert your conclusions here.]
 
-\section{Competing interests}
-No competing interest is declared.
+\section{External Libraries}
 
-\section{Author contributions statement}
-G.Y., L.T., and J.C. conceived the experiment(s), conducted the experiment(s), analyzed the results, and wrote and reviewed the manuscript.
+\begin{itemize}
+    \item \textbf{PyTorch}: Custom neural network implementation.
+    \item \textbf{Pandas}: Data storage and analysis.
+    \item \textbf{Numpy}: Data processing and manipulation.
+    \item \textbf{Matplotlib}: Visualization of training loss curves.
+\end{itemize}
+
+\section{Author Contributions}
+G.Y., L.T., and J.C. conceived, conducted, and analyzed the experiments, and contributed to manuscript preparation and review.
 
 \section{Acknowledgments}
-The authors thank the anonymous reviewers for their valuable suggestions. This work is supported in part by funds from the National Science Foundation (NSF: \# 1636933 and \# 1920920).
+The authors thank the anonymous reviewers for their valuable feedback. This work was supported in part by the National Science Foundation (NSF: \#1636933 and \#1920920).
 
 % \bibliographystyle{plain}
 % \bibliography{reference}
