@@ -16,10 +16,8 @@
 
 \begin{document}
 
-\journaltitle{Journal Title Here}
-\DOI{DOI HERE}
+\journaltitle{Oxford University Press.}
 \copyrightyear{2025}
-\pubyear{2025}
 \appnotes{Paper}
 
 \firstpage{1}
@@ -39,7 +37,7 @@
 \orgaddress{\street{393 Middle Huaxia Road}, \postcode{201210}, \state{Shanghai}, \country{China}}}
 
 \abstract{
-This study evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. We reproduce the Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, using PyTorch. Model performance is validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. Subsequently, AF3-derived protein structures from the CASF-2016 core set are assessed and compared to ground truth structures using Sfcnn scores, to determine the suitability of AF3 predictions in PLA applications.
+This study systematically evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. The Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, was reproduced using PyTorch. Model performance was validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. Subsequently, AF3-derived protein structures from the CASF-2016 core set were assessed and compared to experimentally determined structures using Sfcnn scores, to determine the suitability of AF3 predictions in PLA applications.
 }
 \keywords{AlphaFold3, protein-ligand affinity, CNN scoring function, CASF-2016}
 
@@ -49,15 +47,13 @@ This study evaluates the reliability of AlphaFold3 (AF3)-predicted protein struc
 
 \subsection{Sfcnn Overview}
 \vspace{0.5em}
-Sfcnn is a 3D convolutional neural network-based 
-scoring function introduced in 2022 by Wang et al\footnote{\url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3}}, 
-designed to provide accurate and reliable predictions of binding affinities for protein-ligand complexes.
+Sfcnn is a 3D convolutional neural network-based scoring function introduced by Wang et al.~\cite{Sfcnn} in 2022, designed to provide accurate and reliable predictions of binding affinities for protein-ligand complexes.
 
 \section{Methods}
 
 \subsection{Datasets}
 \vspace{0.5em}
-The Sfcnn network was trained using protein-ligand complexes from the PDBbind v2019 refined set, which includes experimentally determined binding affinities (pKa values). The model was evaluated on the CASF-2016 core set, comprising 285 protein-ligand complexes. To prevent data leakage, 266 overlapping protein complexes between the training and test sets were excluded, resulting in 4,852 unique training complexes.
+The Sfcnn network was trained using protein-ligand complexes from the PDBbind v2019 refined set, which includes experimentally determined binding affinities (pKa values). The model was evaluated on the CASF-2016~\cite{su2018comparative} core set, comprising 285 protein-ligand complexes. To prevent data leakage, 266 overlapping protein complexes between the training and test sets were excluded, resulting in 4,852 unique training complexes.
 
 \subsection{Data Augmentation}
 \vspace{0.5em}
@@ -65,7 +61,7 @@ To increase the effective size of the training set, each protein-ligand complex 
 
 \subsection{Featurization}
 \vspace{0.5em}
-Protein-ligand complexes are represented as 3D grids of size $20 \times 20 \times 20$, with each grid cell encoded as a one-hot vector of length 28. This vector comprises 14 protein atom types\footnote{Visit the original Sfcnn publication for atom type definitions} and 14 ligand atom types. The resulting training tensor has shape $(48520, 20, 20, 20, 28)$.
+Protein-ligand complexes are represented as 3D grids of size $20 \times 20 \times 20$, with each grid cell encoded as a one-hot vector of length 28. This vector comprises 14 protein atom types\footnote{\url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-022-04762-3}} and 14 ligand atom types. The resulting training tensor has shape $(48520, 20, 20, 20, 28)$.
 
 \begin{figure}[H]
     \centering
@@ -95,7 +91,7 @@ The reproduction pipeline utilizes the same datasets and featurization approach,
 
 \subsection{Data Storage}
 \vspace{0.5em}
-The original Sfcnn implementation stored data as concatenated arrays in a single \texttt{.pkl} (pickle) file, requiring all data to reside in memory, which is impractical for extremely large datasets. We adopted the \texttt{.h5} (HDF5) format via \texttt{h5py}, enabling incremental writing and efficient storage. The resulting training grid occupies 40.1 GiB.
+The original Sfcnn implementation stored data as concatenated arrays in a single \texttt{.pkl} (pickle) file, requiring all data to reside in memory, which is impractical for extremely large datasets. The format of \texttt{.h5} (HDF5) via \texttt{h5py} is adopted for incremental writing and efficient storage. The resulting training grid occupies 40.1 GiB.
 
 \subsection{Network Implementation}
 \vspace{0.5em}
@@ -107,7 +103,8 @@ The PyTorch implementation closely mirrors the original TensorFlow version, with
 
 \subsection{Training Procedure}
 \vspace{0.5em}
-Training and validation sets are partitioned as in the original study, with the validation set comprising indices 41,000 to 48,520. The resulting splits are: training $(41,000, 20, 20, 20, 28)$, validation $(7,520, 20, 20, 20, 28)$, and test $(285, 20, 20, 20, 28)$, corresponding to a ratio of 84.00\% : 15.42\% : 0.58\%. The original hyperparameters did not yield convergence in our PyTorch experiments; both original and adjusted hyperparameters are summarized in Table~\ref{tab:hyperparams}.
+Training and validation sets are partitioned as in the original study, with the validation set comprising indices 41,000 to 48,520. The resulting splits are: training $(41,000, 20, 20, 20, 28)$, validation $(7,520, 20, 20, 20, 28)$, and test $(285, 20, 20, 20, 28)$, corresponding to a ratio of 84.00\% : 15.42\% : 0.58\%. 
+Note that the original hyperparameters did not yield convergence in our PyTorch experiments, both hyperparameters are summarized in the the following table.
 
 \begin{table}[H]
 \centering
@@ -126,7 +123,7 @@ Epochs & 200 & 200 \\
 \end{tabular}
 \end{table}
 
-\section{Results}
+\subsection{Reproduced Results}
 
 \subsection{Evaluation Metrics}
 \vspace{0.5em}
@@ -139,11 +136,7 @@ Sfcnn performance is evaluated using the following metrics:
 \mathrm{R} &= \frac{\mathbb{E}[(y_{\text{predict}} - \mu_{y_{\text{predict}}})(y_{\text{true}} - \mu_{y_{\text{true}}})]}{\sigma_{y_{\text{predict}}} \sigma_{y_{\text{true}}}}
 \end{align*}
 
-where $a$ and $b$ are the slope and intercept of the linear 
-regression between predicted and measured values, 
-$\mathbb{E}[\cdot]$ denotes expectation, 
-and $\mu$ and $\sigma$ represent means and standard deviations, 
-respectively.
+where $a$ and $b$ are the slope and intercept of the linear regression between predicted and measured values, $\mathbb{E}[\cdot]$ denotes expectation, and $\mu$ and $\sigma$ represent means and standard deviations, respectively.
 
 \begin{table}[H]
 \centering
@@ -161,25 +154,19 @@ SD & 1.4892 & 1.3252 \\
 \end{tabular}
 \end{table}
 
-Although the original Sfcnn reports superior metrics, 
-its training process did not converge in our reproduction, 
-raising concerns about its reported performance. Due to the lack of access to the original training data and the absence of 
-author response to data requests on GitHub\footnote{\url{https://github.com/bioinfocqupt/Sfcnn/issues/1}}, 
-the original training process is deemed irreproducible.
+Although the original Sfcnn reports superior metrics, its training process did not converge in the reproduction, raising concerns regarding the reproducibility of the reported performance. Due to the lack of access to the original training data and the absence of author response to data requests on GitHub\footnote{\url{https://github.com/bioinfocqupt/Sfcnn/issues/1}}, the original training process is deemed irreproducible.
 
-
-The training, validation and testing result on the four metrics
-are shown in the figure below.
+The training, validation, and testing results for the four metrics are presented in Figure~\ref{fig:ReproducedPlot} and Figure~\ref{fig:OriginalPlot}.
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{minipage}{0.5\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/normal_converge.png}
         \caption{Training curve for reproduced hyperparameters.}
         \label{fig:ReproducedPlot}
     \end{minipage}\hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{minipage}{0.5\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/origin_param.png}
         \caption{Training curve for original hyperparameters.}
@@ -187,15 +174,18 @@ are shown in the figure below.
     \end{minipage}
 \end{figure}
 
+\vspace{-2.5em}
+Since the original hyperparameters significantly deviate from the 
+norm and did not reach proper comvergence,
+the reproducted results are 
+considered the baseline for subsequent AF3 result assessment.
 
-The convergent results from our reproduction are considered the baseline for subsequent AF3 assessment.
-
-
+\vspace{-1em}
 \section{AlphaFold3 Structure Assessment}
 
 \subsection{Dataset}
 The assessment utilizes the CASF-2016 core set, excluding six proteins with structural complexity beyond AlphaFold3's predictive capacity, resulting in 279 proteins. Proteins with more than five isomorphic or heterogeneous chains were excluded, as detailed in Table~\ref{tab:complex}.
-
+\vspace{-1em}
 \begin{table}[H]
 \centering
 \caption{Excluded Complex Protein Structures}
@@ -222,16 +212,17 @@ Protein structures were generated using the \textit{Chai-1 online server}\footno
 \paragraph{Docking and File Handling}
 Server outputs were downloaded as zip archives containing multiple ranked structures and associated metrics. The top-ranked structure (\texttt{pred.rank\_0.cif}) was selected for analysis. To avoid conversion errors between file formats (.cif, .pdb, .mol2), structures were parsed directly using the \texttt{MMCIFParser} from Bio.PDB, followed by featurization and grid mapping.
 
-Note: Atoms or isotopes not included in the 14 predefined atom types are categorized as \texttt{other}.
+Atoms or isotopes not included in the 14 predefined atom types are categorized as \texttt{other}.
 
 \paragraph{Scoring}
-
 Predicted structures were scored using the reproduced Sfcnn network, loaded with pre-trained weights (Pearson R = 0.728). Detailed analysis of PLA results and metrics is provided in the subsequent section.
 
-
+\subsection{Result Analysis}
+\vspace{0.5em}
+[Detailed analysis of the results should be inserted here.]
 
 \section{Conclusion}
-This section will summarize the principal findings and implications of the study. [Please insert your conclusions here.]
+This study presents a systematic evaluation of AlphaFold3-predicted protein structures for protein-ligand affinity prediction using a reproduced Sfcnn model. The findings highlight the importance of reproducibility in deep learning models for structural biology and demonstrate the current capabilities and limitations of AF3 in the context of PLA prediction. [Further conclusions and implications should be added here.]
 
 \section{External Libraries}
 
@@ -248,7 +239,7 @@ G.Y., L.T., and J.C. conceived, conducted, and analyzed the experiments, and con
 \section{Acknowledgments}
 The authors thank the anonymous reviewers for their valuable feedback. This work was supported in part by the National Science Foundation (NSF: \#1636933 and \#1920920).
 
-% \bibliographystyle{plain}
-% \bibliography{reference}
+\bibliographystyle{plain}
+\bibliography{reference}
 
 \end{document}

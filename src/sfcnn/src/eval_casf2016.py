@@ -8,7 +8,7 @@ from sklearn import linear_model
 from train import HDF5GridDataset
 import scipy
 
-MODEL_PATH = 'src/sfcnn/src/train_results/valuable_models/pearson-0.728.pt'
+MODEL_PATH = 'src/sfcnn/src/train_results/valuable_models/pearson-0.7686.pt'
 
 
 CORE_GRIDS = r'data/test_hdf5/core_grids.h5'

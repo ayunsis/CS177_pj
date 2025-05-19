@@ -1,5 +1,13 @@
 # Fdb version 4
-["pdflatex"] 1747320492 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1747320494 0
+["bibtex main"] 1747556130 "main.aux" "main.bbl" "main" 1747556288 0
+  "./reference.bib" 1747383706 1949 cb1c17690bfb7fc4bd81e33633ae1915 ""
+  "c:/texlive/2023/texmf-dist/bibtex/bst/base/plain.bst" 1709296319 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
+  "main.aux" 1747556287 6287 094b28f545ebe93aff1f0e88df1906be "pdflatex"
+  (generated)
+  "main.bbl"
+  "main.blg"
+  (rewritten before read)
+["pdflatex"] 1747556284 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1747556288 0
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1709296399 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1709296629 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm0600.tfm" 1709296531 1536 12e8c510d3e158fdd0e9a42e75118bd9 ""
@@ -220,14 +228,15 @@
   "c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1709297760 4662804 27f73c2f767ae4579fe38abe9088e726 ""
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1709297927 7883442 5f66b8dca6fb943244df223f16609769 ""
   "c:/texlive/2023/texmf.cnf" 1709297744 713 e69b156964470283e0530f5060668171 ""
-  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1747320491 11413 0fb4ee8d4d76f779b203759963b538dd ""
+  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1747556283 12227 de5573f4f43e250b0adc40b57723ad83 ""
   "images/CNN.png" 1746622087 309923 19cc4d6734546d8388879aa3d7951313 ""
-  "images/normal_converge.png" 1746406368 183159 c5f079f0abbdf8296cb7c0fa47e0a1d7 ""
+  "images/normal_converge.png" 1747482164 163862 3792a273763f619df6ebbc1f5cd58096 ""
   "images/one_hot.png" 1746618490 269494 13a9478612076a466c9799a527d5843b ""
   "images/origin_param.png" 1746494326 216773 f1bc5d7b8e26af14c16a48a7965a591a ""
-  "main.aux" 1747320494 5931 122d48a89c7688da822d94656b30f9a3 "pdflatex"
-  "main.out" 1747320494 3153 d40c389fa7d6b55ef7307e67b4c73617 "pdflatex"
-  "main.tex" 1747320491 11413 0fb4ee8d4d76f779b203759963b538dd ""
+  "main.aux" 1747556287 6287 094b28f545ebe93aff1f0e88df1906be "pdflatex"
+  "main.bbl" 1747556131 571 9f3768614cbf988fa5ed5de67f7b1f2a "bibtex main"
+  "main.out" 1747556287 3360 a2be7f79c8295d01df646d1b99d5bd03 "pdflatex"
+  "main.tex" 1747556283 12227 de5573f4f43e250b0adc40b57723ad83 ""
   (generated)
   "main.aux"
   "main.log"

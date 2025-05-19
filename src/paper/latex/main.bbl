@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{su2018comparative}
+Minyi Su, Qifan Yang, Yu~Du, Guoqin Feng, Zhihai Liu, Yan Li, and Renxiao Wang.
+\newblock Comparative assessment of scoring functions: The casf-2016 update.
+\newblock {\em Journal of Chemical Information and Modeling}, 59(2):895--913, 2019.
+
+\bibitem{Sfcnn}
+Yu~Wang, Zhengxiao Wei, and Lei Xi.
+\newblock Sfcnn: a novel scoring function based on 3d convolutional neural network for accurate and stable protein–ligand affinity prediction.
+\newblock {\em BMC Bioinformatics}, 23(1):222, 2022.
+
+\end{thebibliography}
