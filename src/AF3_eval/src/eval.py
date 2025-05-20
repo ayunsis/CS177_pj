@@ -16,25 +16,34 @@ class HDF5GridDataset(Dataset):
         self.label_key = label_key
         self.indices = indices
         self.normalize_y = normalize_y
+        self.length = None
+        self.h5_file = None
+        self.label_file = None
         with h5py.File(self.h5_path, 'r') as f:
             self.length = len(f[self.data_key]) if indices is None else len(indices)
+
     def __len__(self):
         return self.length
-    def __getitem__(self, idx):
-        real_idx = self.indices[idx] if self.indices is not None else idx
-        with h5py.File(self.h5_path, 'r') as f:
-            grid = torch.tensor(f[self.data_key][real_idx], dtype=torch.float32)
 
+    def _ensure_open(self):
+        if self.h5_file is None:
+            self.h5_file = h5py.File(self.h5_path, 'r')
+        if self.label_path and self.label_file is None:
+            self.label_file = h5py.File(self.label_path, 'r')
+
+    def __getitem__(self, idx):
+        self._ensure_open()
+        real_idx = self.indices[idx] if self.indices is not None else idx
+        grid = torch.tensor(self.h5_file[self.data_key][real_idx], dtype=torch.float32)
         if self.label_path is not None and self.label_key is not None:
-            with h5py.File(self.label_path, 'r') as f:
-                label = torch.tensor(f[self.label_key][real_idx], dtype=torch.float32).unsqueeze(0)
-                label = label / self.normalize_y
+            label = torch.tensor(self.label_file[self.label_key][real_idx], dtype=torch.float32).unsqueeze(0)
+            label = label / self.normalize_y
             return grid, label
         else:
             return grid
         
 
-MODEL_PATH = 'src/AF3_eval/model/pearson-0.728.pt'
+MODEL_PATH = 'src/AF3_eval/model/pearson-0.7686.pt'
 CORE_GRIDS = r'data/chai_hdf5/core_grids.h5'
 CORE_2016_LABEL = r'data/chai_hdf5/core_2016_label.h5'
 CORE_sfcnn_LABEL = r'data/chai_hdf5/core_sfcnn_label.h5'

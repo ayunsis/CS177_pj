@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.00072, type=float)
+    parser.add_argument('--lr', default=0.000675, type=float)
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     test_metrics_history = []
     best_pearson = -1.0
 
-    TRAIN_EPOCHS = 300
+    TRAIN_EPOCHS = 400
     SAVE_EPOCHS = 0
 
     # --- Mixed Precision Setup ---
