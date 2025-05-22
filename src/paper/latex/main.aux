@@ -13,58 +13,70 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{AF3}
 \citation{Sfcnn}
 \citation{Wang2005PDBbind}
 \citation{su2018comparative}
 \newcplabel{^_1}{1}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{1.1}}Sfcnn Overview}{1}{subsection.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Methods}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{1.1}}Background}{1}{subsection.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{1.2}}Objective}{1}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Materials and Methods}{1}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {{2.1}}Datasets}{1}{subsection.2.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {{2.2}}Data Augmentation}{1}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {{2.3}}Featurization}{1}{subsection.2.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Default resolution is $20\times 20\times 20$ with 28 atomic categories.\relax }}{1}{figure.caption.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Default resolution is $20\times 20\times 20$ with 28 atomic categories.\relax }}{2}{figure.caption.1}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:onehot}{{1}{1}{Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Default resolution is $20\times 20\times 20$ with 28 atomic categories.\relax }{figure.caption.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Network Architecture}{1}{section.3}\protected@file@percent }
+\newlabel{fig:onehot}{{1}{2}{Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Default resolution is $20\times 20\times 20$ with 28 atomic categories.\relax }{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Sfcnn Network Architecture and Implementation}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{3.1}}Architecture}{2}{subsection.3.1}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Final CNN architecture for the Sfcnn network.\relax }}{2}{figure.caption.2}\protected@file@percent }
 \newlabel{fig:CNN}{{2}{2}{Final CNN architecture for the Sfcnn network.\relax }{figure.caption.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Reproduction Study}{2}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{4.1}}Dataset and Featurization}{2}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{4.2}}Data Storage}{2}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{4.3}}Network Implementation}{2}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{4.4}}Training Procedure}{2}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{3.2}}Implementation Details}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{3.3}}Data Storage}{2}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{3.4}}Training Procedure}{2}{subsection.3.4}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Original and Reproduced Hyperparameters\relax }}{2}{table.caption.3}\protected@file@percent }
 \newlabel{tab:hyperparams}{{1}{2}{Original and Reproduced Hyperparameters\relax }{table.caption.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {{4.5}}Reproduced Results}{2}{subsection.4.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{4.6}}Evaluation Metrics}{2}{subsection.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Reproduced Results}{2}{section.4}\protected@file@percent }
+\newlabel{sec:ReproducedResults}{{4}{2}{Reproduced Results}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {{4.1}}Evaluation Metrics}{2}{subsection.4.1}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Performance Metrics on CASF-2016 Core Set\relax }}{2}{table.caption.4}\protected@file@percent }
 \newlabel{tab:metrics}{{2}{2}{Performance Metrics on CASF-2016 Core Set\relax }{table.caption.4}{}}
-\bibstyle{plain}
-\bibdata{reference}
-\bibcite{su2018comparative}{{1}{}{{}}{{}}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Training curve for reproduced hyperparameters.\relax }}{3}{figure.caption.5}\protected@file@percent }
 \newlabel{fig:ReproducedPlot}{{3}{3}{Training curve for reproduced hyperparameters.\relax }{figure.caption.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Training curve for original hyperparameters.\relax }}{3}{figure.caption.5}\protected@file@percent }
 \newlabel{fig:OriginalPlot}{{4}{3}{Training curve for original hyperparameters.\relax }{figure.caption.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}AlphaFold3 Structure Assessment}{3}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{5.1}}Dataset}{3}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{5.1}}Dataset Selection}{3}{subsection.5.1}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Excluded Complex Protein Structures\relax }}{3}{table.caption.6}\protected@file@percent }
 \newlabel{tab:complex}{{3}{3}{Excluded Complex Protein Structures\relax }{table.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {{5.2}}Workflow}{3}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Structure Generation}{3}{section*.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Docking and File Handling}{3}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Scoring}{3}{section*.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {{5.3}}Result Analysis}{3}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{3}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}External Libraries}{3}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Author Contributions}{3}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Acknowledgments}{3}{section.9}\protected@file@percent }
-\bibcite{Wang2005PDBbind}{{2}{}{{}}{{}}}
-\bibcite{Sfcnn}{{3}{}{{}}{{}}}
-\global\@namedef{@lastpage@}{4}
+\@writefile{toc}{\contentsline {subsection}{\numberline {{5.2}}Structure Generation and Processing}{3}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{5.3}}Scoring Protocol}{3}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Performance metrics for AF3-predicted structures compared to ground truth and Sfcnn predictions on the core set.\relax }}{3}{table.caption.7}\protected@file@percent }
+\newlabel{tab:af3_metrics}{{4}{3}{Performance metrics for AF3-predicted structures compared to ground truth and Sfcnn predictions on the core set.\relax }{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {{5.4}}Error Analysis and Visualization}{4}{subsection.5.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Heatmap (top) of the top 20 complexes with largest prediction gaps and histogram (bottom) of absolute prediction gaps for AF3 structures.\relax }}{4}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:af3_heatmap_hist}{{5}{4}{Heatmap (top) of the top 20 complexes with largest prediction gaps and histogram (bottom) of absolute prediction gaps for AF3 structures.\relax }{figure.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Boxplot (left) and violin plot (right) of prediction gaps for AF3 structures.\relax }}{4}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:af3_gap_box_violin}{{6}{4}{Boxplot (left) and violin plot (right) of prediction gaps for AF3 structures.\relax }{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {{5.5}}Interpretation and Implications}{4}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{4}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Author Contributions}{4}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{7.1}}Guo Yu}{4}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{7.2}}Yiming Wu}{4}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{7.3}}Yiyang Tan}{4}{subsection.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {{7.4}}All Authors}{4}{subsection.7.4}\protected@file@percent }
+\bibstyle{plain}
+\bibdata{reference}
+\bibcite{AF3}{{1}{}{{}}{{}}}
+\bibcite{su2018comparative}{{2}{}{{}}{{}}}
+\bibcite{Wang2005PDBbind}{{3}{}{{}}{{}}}
+\bibcite{Sfcnn}{{4}{}{{}}{{}}}
+\global\@namedef{@lastpage@}{5}
+\@writefile{toc}{\contentsline {section}{\numberline {8}External Libraries}{5}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Acknowledgments}{5}{section.9}\protected@file@percent }
 \expandafter\ifx\csname c@myauthcount@totc\endcsname\relax\newcounter{myauthcount@totc}\fi\setcounter{myauthcount@totc}{3}
 \expandafter\ifx\csname c@myhistorycount@totc\endcsname\relax\newcounter{myhistorycount@totc}\fi\setcounter{myhistorycount@totc}{0}
 \expandafter\ifx\csname c@myaddcount@totc\endcsname\relax\newcounter{myaddcount@totc}\fi\setcounter{myaddcount@totc}{1}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\gdef \@abspage@last{4}
+\gdef \@abspage@last{5}

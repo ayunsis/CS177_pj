@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1747665084 "main.aux" "main.bbl" "main" 1747665088 0
+["bibtex main"] 1747890203 "main.aux" "main.bbl" "main" 1747890208 0
   "./reference.bib" 1747665083 2355 d5aeebbeafbb414ff68c12eaa9ff695a ""
   "c:/texlive/2023/texmf-dist/bibtex/bst/base/plain.bst" 1709296319 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1747665087 6355 4d028026063037862bae09528999c97e "pdflatex"
+  "main.aux" 1747890207 8201 ff00259d5e8f6d9803eb5dae09d10537 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1747665084 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1747665088 0
+["pdflatex"] 1747890204 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1747890208 0
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1709296399 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1709296629 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm0600.tfm" 1709296531 1536 12e8c510d3e158fdd0e9a42e75118bd9 ""
@@ -228,15 +228,19 @@
   "c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1709297760 4662804 27f73c2f767ae4579fe38abe9088e726 ""
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1709297927 7883442 5f66b8dca6fb943244df223f16609769 ""
   "c:/texlive/2023/texmf.cnf" 1709297744 713 e69b156964470283e0530f5060668171 ""
-  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1747664944 12250 ccd0c9dbf0d4a08b51b034dcafa6ee96 ""
+  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1747890198 17812 b260f93ba333fae25a3f74efdd3e167d ""
   "images/CNN.png" 1746622087 309923 19cc4d6734546d8388879aa3d7951313 ""
+  "images/gap_boxplot.png" 1747744521 99981 e621da2d7bd8a6f4d1ddeddc3b123572 ""
+  "images/gap_histogram.png" 1747744521 290620 a2e90601e00e6c03e906dfac7d7c0201 ""
+  "images/gap_violinplot.png" 1747744522 264488 dcef0d52770b7d132ccf15e7c1af3124 ""
   "images/normal_converge.png" 1747482164 163862 3792a273763f619df6ebbc1f5cd58096 ""
   "images/one_hot.png" 1746618490 269494 13a9478612076a466c9799a527d5843b ""
   "images/origin_param.png" 1746494326 216773 f1bc5d7b8e26af14c16a48a7965a591a ""
-  "main.aux" 1747665087 6355 4d028026063037862bae09528999c97e "pdflatex"
-  "main.bbl" 1747665084 803 06b5987416568d0e54567c18e4bf83df "bibtex main"
-  "main.out" 1747665087 3360 a2be7f79c8295d01df646d1b99d5bd03 "pdflatex"
-  "main.tex" 1747664944 12250 ccd0c9dbf0d4a08b51b034dcafa6ee96 ""
+  "images/top20_heatmap.png" 1747882419 347693 d9d9fd568e3b65fd7f1b7672b07c3f6c ""
+  "main.aux" 1747890207 8201 ff00259d5e8f6d9803eb5dae09d10537 "pdflatex"
+  "main.bbl" 1747890204 994 0aebfb42146ea05a5d990b1bcfc699d1 "bibtex main"
+  "main.out" 1747890207 4059 90a4e2a031334d4c065140730325d665 "pdflatex"
+  "main.tex" 1747890198 17812 b260f93ba333fae25a3f74efdd3e167d ""
   (generated)
   "main.aux"
   "main.log"

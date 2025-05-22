@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{AF3}
+Dunger J. et~al. Abramson~J., Adler~J.
+\newblock Accurate structure prediction of biomolecular interactions with alphafold 3.
+\newblock {\em Nature}, 630(8016):493--500, 2024.
+
 \bibitem{su2018comparative}
 Minyi Su, Qifan Yang, Yu~Du, Guoqin Feng, Zhihai Liu, Yan Li, and Renxiao Wang.
 \newblock Comparative assessment of scoring functions: The casf-2016 update.
