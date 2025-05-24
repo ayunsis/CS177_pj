@@ -9,6 +9,7 @@ import argparse
 from tqdm import tqdm
 from sklearn import linear_model
 import warnings
+import shutil
 warnings.filterwarnings("ignore")
 
 class HDF5GridDataset(Dataset):
@@ -71,9 +72,9 @@ if __name__ == '__main__':
         return train_idx, val_idx
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', '-b', default=32, type=int)
-    parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.00085, type=float)
+    parser.add_argument('--batch', '-b', default=32, type=int)  # Increased from 32
+    parser.add_argument('--dropout', '-d', default=0.3, type=float)  # Increased from 0.15
+    parser.add_argument('--lr', default=0.00065, type=float)  # Reduced from 0.00085
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
@@ -157,13 +158,33 @@ if __name__ == '__main__':
     model = CNN3D(dropout=args.dropout).to(device)
     last_linear = model.fc[-1]
     params = [
-        {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
-        {'params': last_linear.parameters(), 'weight_decay': 0.01} 
+        {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 5e-5},  # Reduced from 1e-4
+        {'params': last_linear.parameters(), 'weight_decay': 5e-3}  # Reduced from 1e-2
     ]
-    optimizer = optim.RMSprop(params, lr=args.lr)
-    criterion = nn.MSELoss()
+    optimizer = optim.AdamW(params, lr=args.lr, betas=(0.9, 0.999), eps=1e-8)
 
-    os.makedirs('src/sfcnn/src/train_results/cnnmodel', exist_ok=True)
+    TRAIN_EPOCHS = 200  # Reduced from 400
+    SAVE_EPOCHS = 0
+
+    warmup_epochs = 20  # Increased from 10
+    total_steps = len(train_loader) * TRAIN_EPOCHS
+    warmup_steps = len(train_loader) * warmup_epochs
+    
+    def lr_lambda(current_step):
+        if current_step < warmup_steps:
+            return float(current_step) / float(max(1, warmup_steps))
+        else:
+            progress = float(current_step - warmup_steps) / float(max(1, total_steps - warmup_steps))
+            return 0.5 * (1.0 + np.cos(np.pi * progress))
+    
+    scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+    criterion = nn.SmoothL1Loss()
+
+    # Remove existing cnnmodel directory if it exists
+    cnnmodel_dir = 'src/sfcnn/src/train_results/cnnmodel'
+    if os.path.exists(cnnmodel_dir):
+        shutil.rmtree(cnnmodel_dir)
+    os.makedirs(cnnmodel_dir, exist_ok=True)
 
     train_loss_history = []
     train_metrics_history = []
@@ -171,8 +192,7 @@ if __name__ == '__main__':
     test_metrics_history = []
     best_pearson = -1.0
 
-    TRAIN_EPOCHS = 400
-    SAVE_EPOCHS = 0
+
 
     # --- Mixed Precision Setup ---
     from torch.cuda.amp import autocast, GradScaler
@@ -191,8 +211,11 @@ if __name__ == '__main__':
                 pred = model(xb)
                 loss = criterion(pred, yb)
             scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             scaler.step(optimizer)
             scaler.update()
+            scheduler.step()
             train_loss += loss.item() * xb.size(0)
             train_preds.append(pred.detach().cpu().numpy())
             train_targets.append(yb.detach().cpu().numpy())

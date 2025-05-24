@@ -12,6 +12,9 @@ sfcnn_df['gap'] = (sfcnn_df['score'] - sfcnn_df['affinity']).abs()
 core2016_df['gap'] = core2016_df['gap'].round(2)
 sfcnn_df['gap'] = sfcnn_df['gap'].round(2)
 sfcnn_core_gap = (core2016_df['gap'] - sfcnn_df['gap']).abs()
+
+
+
 sfcnn_core_gap = sfcnn_core_gap.round(2)
 
 # Set a consistent color palette
@@ -52,7 +55,7 @@ plt.savefig('src/AF3_eval/outputs/img/sfcnn_diff_comparison.png', dpi=300)
 
 
 
-top20_idx = core2016_df['gap'].nlargest(20).index
+top20_idx = sfcnn_core_gap.nlargest(20).index
 heatmap_data = pd.DataFrame({
     'core2016_gap': core2016_df.loc[top20_idx, 'gap'].values,
     'sfcnn_gap': sfcnn_df.loc[top20_idx, 'gap'].values,

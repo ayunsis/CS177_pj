@@ -1258,10 +1258,10 @@ INPUT ./images/gap_violinplot.png
 INPUT images/gap_violinplot.png
 INPUT ./images/gap_violinplot.png
 INPUT ./images/gap_violinplot.png
+INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
-INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
 INPUT ./main.bbl
 INPUT main.bbl
 INPUT ./main.bbl

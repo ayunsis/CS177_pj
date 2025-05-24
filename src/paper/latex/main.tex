@@ -96,7 +96,7 @@ The PyTorch implementation closely mirrors the original TensorFlow version, with
 The original Sfcnn implementation stored data as concatenated arrays in a single \texttt{.pkl} (pickle) file, requiring all data to reside in memory, which is impractical for extremely large datasets. The format of \texttt{.h5} (HDF5) via \texttt{h5py} is adopted for incremental writing and efficient storage. The resulting training grid occupies 40.1 GiB.
 
 \subsection{Training Procedure}
-Training and validation sets are partitioned as in the original study, with the validation set comprising indices 41,000 to 48,520. The resulting splits are: training $(41,000, 20, 20, 20, 28)$, validation $(7,520, 20, 20, 20, 28)$, and test $(285, 20, 20, 20, 28)$, corresponding to a ratio of 84.00\% : 15.42\% : 0.58\%. 
+Training and validation sets are partitioned as in the original study, with the validation set comprising indices 41,000 to 48,520. The resulting splits are: training $(41,000, 20,20,20,28)$, validation $(7,520, 20,20,20,28)$, and test $(285, 20,20,20,28)$, corresponding to a ratio of 84.00\% : 15.42\% : 0.58\%. 
 
 Note that the original hyperparameters did not yield convergence in our PyTorch experiments. Both sets of hyperparameters are summarized below.
 
@@ -261,15 +261,19 @@ maintains moderate agreement with experimental affinities on the CASF-2016 core 
 its predictive performance deteriorates when applied to AF3-predicted structures. 
 The observed increase in RMSE and MAE, coupled with reduced correlation, 
 indicates that current AF3 structural models introduce additional uncertainty into affinity 
-prediction pipelines.
-
-These findings suggest that, although AlphaFold3 is capable of generating plausible 
+prediction pipelines. Although AlphaFold3 is capable of generating plausible 
 protein-ligand complex structures, its predictions are not yet sufficiently robust for 
-quantitative PLA prediction using state-of-the-art deep learning scoring functions. 
-Further methodological advances in both structure prediction accuracy and model robustness 
-are required before AF3-generated structures can be reliably integrated into affinity 
-prediction workflows.
+quantitative PLA prediction using state-of-the-art deep learning scoring functions.
 
+\subsection{Hypotheses for AF3's Reduced Performance}
+The observed decrease in PLA prediction accuracy for AF3-generated structures may be attributed to two main factors:
+
+\begin{enumerate}
+    \item \textbf{Protein Structure-Specific Limitations:} Certain proteins in the CASF-2016 core set may possess structural features—such as large multimeric assemblies, flexible or disordered regions, or unusual binding site conformations—that challenge AF3's predictive capabilities. These cases can result in inaccurate modeling of the binding interface, leading to poor downstream affinity predictions.
+    \item \textbf{AF3 Model and Dataset Constraints:} AlphaFold3 was primarily optimized for general protein and protein-ligand structure prediction, not specifically for quantitative affinity estimation. Its training data, loss functions, and architectural choices may not capture the subtle determinants critical for accurate PLA prediction. The lack of explicit optimization for binding affinity tasks may limit the transferability of AF3-generated structures to deep learning-based scoring functions such as Sfcnn.
+\end{enumerate}
+
+These hypotheses suggest that both target-specific structural challenges and broader methodological limitations of AF3 contribute to the observed performance gap. Future work could involve targeted analysis of outlier complexes and the development of structure prediction models tailored for affinity prediction tasks.
 
 \section{Conclusion}
 This study presents a systematic evaluation of AlphaFold3-predicted protein structures 
