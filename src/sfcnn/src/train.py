@@ -8,6 +8,7 @@ import h5py
 import argparse
 from tqdm import tqdm
 from sklearn import linear_model
+from sklearn.model_selection import KFold
 import warnings
 import shutil
 warnings.filterwarnings("ignore")
@@ -72,37 +73,25 @@ if __name__ == '__main__':
         return train_idx, val_idx
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', '-b', default=32, type=int)  # Increased from 32
-    parser.add_argument('--dropout', '-d', default=0.3, type=float)  # Increased from 0.15
-    parser.add_argument('--lr', default=0.00065, type=float)  # Reduced from 0.00085
+    parser.add_argument('--batch', '-b', default=64, type=int)
+    parser.add_argument('--dropout', '-d', default=0.15, type=float)
+    parser.add_argument('--lr', default=0.0013, type=float)
+    parser.add_argument('--k_folds', '-k', default=5, type=int, help='Number of folds for cross validation')
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
         total = len(f['train_grids'])
-    train_idx, val_idx = get_indices(total)
-
+    
+    # Use all training data for cross validation
+    all_train_idx = np.arange(total)
+    
     with h5py.File(CORE_GRIDS, 'r') as f:
         test_len = len(f['core_grids'])
     test_idx = np.arange(test_len)
 
-    train_dataset = HDF5GridDataset(
-        TRAIN_GRIDS, 'train_grids', TRAIN_LABEL, 'train_label', train_idx
-    )
-    val_dataset = HDF5GridDataset(
-        TRAIN_GRIDS, 'train_grids', TRAIN_LABEL, 'train_label', val_idx
-    )
     test_dataset = HDF5GridDataset(
         CORE_GRIDS, 'core_grids', CORE_LABEL, 'core_label', test_idx
     )
-    train_loader = DataLoader(train_dataset, 
-                              batch_size=args.batch, 
-                              shuffle=True, 
-                              pin_memory=True, 
-                              num_workers=2)
-    val_loader = DataLoader(val_dataset, 
-                            batch_size=args.batch, 
-                            pin_memory=True, 
-                            num_workers=2)
     test_loader = DataLoader(test_dataset, 
                              batch_size=args.batch, 
                              pin_memory=True, 
@@ -155,141 +144,278 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('current device: ', device)
 
-    model = CNN3D(dropout=args.dropout).to(device)
-    last_linear = model.fc[-1]
-    params = [
-        {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 5e-5},  # Reduced from 1e-4
-        {'params': last_linear.parameters(), 'weight_decay': 5e-3}  # Reduced from 1e-2
-    ]
-    optimizer = optim.AdamW(params, lr=args.lr, betas=(0.9, 0.999), eps=1e-8)
+    if os.path.exists('src/sfcnn/src/train_results/cnnmodel'):
+        shutil.rmtree('src/sfcnn/src/train_results/cnnmodel')
+    os.makedirs('src/sfcnn/src/train_results/cnnmodel', exist_ok=True)
+    
+    # Create overall results directory
+    if os.path.exists('src/sfcnn/src/train_results/cv_results'):
+        shutil.rmtree('src/sfcnn/src/train_results/cv_results')
+    os.makedirs('src/sfcnn/src/train_results/cv_results', exist_ok=True)
 
-    TRAIN_EPOCHS = 200  # Reduced from 400
+    # Cross validation setup
+    kfold = KFold(n_splits=args.k_folds, shuffle=True, random_state=1234)
+    fold_results = []
+    best_overall_pearson = -1.0
+    best_fold = -1
+
+    TRAIN_EPOCHS = 2
     SAVE_EPOCHS = 0
-
-    warmup_epochs = 20  # Increased from 10
-    total_steps = len(train_loader) * TRAIN_EPOCHS
-    warmup_steps = len(train_loader) * warmup_epochs
-    
-    def lr_lambda(current_step):
-        if current_step < warmup_steps:
-            return float(current_step) / float(max(1, warmup_steps))
-        else:
-            progress = float(current_step - warmup_steps) / float(max(1, total_steps - warmup_steps))
-            return 0.5 * (1.0 + np.cos(np.pi * progress))
-    
-    scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-    criterion = nn.SmoothL1Loss()
-
-    # Remove existing cnnmodel directory if it exists
-    cnnmodel_dir = 'src/sfcnn/src/train_results/cnnmodel'
-    if os.path.exists(cnnmodel_dir):
-        shutil.rmtree(cnnmodel_dir)
-    os.makedirs(cnnmodel_dir, exist_ok=True)
-
-    train_loss_history = []
-    train_metrics_history = []
-    val_metrics_history = []
-    test_metrics_history = []
-    best_pearson = -1.0
-
-
 
     # --- Mixed Precision Setup ---
     from torch.cuda.amp import autocast, GradScaler
-    scaler = GradScaler()
-    # ----------------------------
-
-    for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
-        model.train()
-        train_loss = 0
-        train_preds = []
-        train_targets = []
-        for xb, yb in tqdm(train_loader, desc=f"Train {epoch:03d}", leave=False):
-            xb, yb = xb.to(device), yb.to(device)  
-            optimizer.zero_grad()
-            with autocast():
-                pred = model(xb)
-                loss = criterion(pred, yb)
-            scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-            scaler.step(optimizer)
-            scaler.update()
-            scheduler.step()
-            train_loss += loss.item() * xb.size(0)
-            train_preds.append(pred.detach().cpu().numpy())
-            train_targets.append(yb.detach().cpu().numpy())
-        train_loss /= len(train_loader.dataset)
-        train_loss_history.append(train_loss)
-
-        train_preds = np.concatenate(train_preds).flatten()
-        train_targets = np.concatenate(train_targets).flatten()
-        train_pearson = np.corrcoef(train_preds, train_targets)[0, 1]
-        train_rmse = np.sqrt(np.mean((train_preds - train_targets) ** 2))
-        train_mae = np.mean(np.abs(train_preds - train_targets))
-        train_regr = linear_model.LinearRegression()
-        x_train = train_preds.reshape(-1, 1)
-        y_train = train_targets.reshape(-1, 1)
-        train_regr.fit(x_train, y_train)
-        y_train_ = train_regr.predict(x_train)
-        train_sd = np.sqrt(np.sum((y_train - y_train_) ** 2) / (len(y_train) - 1.0))
-        train_metrics_history.append([epoch, train_pearson, train_rmse, train_mae, train_sd])
+    
+    for fold, (train_ids, val_ids) in enumerate(kfold.split(all_train_idx)):
+        print(f'\nFOLD {fold + 1}/{args.k_folds}')
+        print('-' * 50)
         
-        if epoch >= SAVE_EPOCHS:
-            model.eval()
-            preds = []
-            targets = []
-            with torch.no_grad():
-                for xb, yb in tqdm(val_loader, desc=f"Validation Metrics {epoch:03d}", leave=False):
-                    xb, yb = xb.to(device), yb.to(device)
-                    with autocast():
-                        pred = model(xb)
-                    preds.append(pred.cpu().numpy())
-                    targets.append(yb.cpu().numpy())
-            preds = np.concatenate(preds).flatten()
-            targets = np.concatenate(targets).flatten()
-            pearson = np.corrcoef(preds, targets)[0, 1]
-            rmse = np.sqrt(np.mean((preds - targets) ** 2))
-            mae = np.mean(np.abs(preds - targets))
+        # Create fold-specific directories
+        fold_dir = f'src/sfcnn/src/train_results/cv_results/fold_{fold+1}'
+        fold_model_dir = f'{fold_dir}/models'
+        fold_metrics_dir = f'{fold_dir}/metrics'
+        
+        os.makedirs(fold_model_dir, exist_ok=True)
+        os.makedirs(fold_metrics_dir, exist_ok=True)
+        
+        # Create datasets for this fold
+        train_fold_idx = all_train_idx[train_ids]
+        val_fold_idx = all_train_idx[val_ids]
+        
+        # Save fold indices for reproducibility
+        np.save(f'{fold_dir}/train_indices.npy', train_fold_idx)
+        np.save(f'{fold_dir}/val_indices.npy', val_fold_idx)
+        
+        train_dataset = HDF5GridDataset(
+            TRAIN_GRIDS, 'train_grids', TRAIN_LABEL, 'train_label', train_fold_idx
+        )
+        val_dataset = HDF5GridDataset(
+            TRAIN_GRIDS, 'train_grids', TRAIN_LABEL, 'train_label', val_fold_idx
+        )
+        
+        train_loader = DataLoader(train_dataset, 
+                                  batch_size=args.batch, 
+                                  shuffle=True, 
+                                  pin_memory=True, 
+                                  num_workers=2)
+        val_loader = DataLoader(val_dataset, 
+                                batch_size=args.batch, 
+                                pin_memory=True, 
+                                num_workers=2)
+        
+        # Initialize model for this fold
+        model = CNN3D(dropout=args.dropout).to(device)
+        last_linear = model.fc[-1]
+        params = [
+            {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
+            {'params': last_linear.parameters(), 'weight_decay': 0.01} 
+        ]
+        optimizer = optim.RMSprop(params, lr=args.lr)
+        criterion = nn.MSELoss()
+        scaler = GradScaler()
+
+        train_loss_history = []
+        train_metrics_history = []
+        val_metrics_history = []
+        test_metrics_history = []
+        best_fold_pearson = -1.0
+
+        for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc=f"Fold {fold+1} Progress", unit="epoch"):
+            model.train()
+            train_loss = 0
+            train_preds = []
+            train_targets = []
             
-            regr = linear_model.LinearRegression()
-            x = preds.reshape(-1, 1)
-            y = targets.reshape(-1, 1)
-            regr.fit(x, y)
-            y_ = regr.predict(x)
-            sd = np.sqrt(np.sum((y - y_) ** 2) / (len(y) - 1.0))
+            # Training loop with progress bar
+            train_pbar = tqdm(train_loader, desc=f"F{fold+1}E{epoch:03d} Train", leave=False, unit="batch")
+            for xb, yb in train_pbar:
+                xb, yb = xb.to(device), yb.to(device)  
+                optimizer.zero_grad()
+                with autocast():
+                    pred = model(xb)
+                    loss = criterion(pred, yb)
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+                train_loss += loss.item() * xb.size(0)
+                train_preds.append(pred.detach().cpu().numpy())
+                train_targets.append(yb.detach().cpu().numpy())
+                
+                # Update progress bar with current loss
+                train_pbar.set_postfix(loss=f"{loss.item():.4f}")
+            
+            train_pbar.close()
+            train_loss /= len(train_loader.dataset)
+            train_loss_history.append(train_loss)
 
-            val_metrics_history.append([epoch, pearson, rmse, mae, sd])
+            train_preds = np.concatenate(train_preds).flatten()
+            train_targets = np.concatenate(train_targets).flatten()
+            train_pearson = np.corrcoef(train_preds, train_targets)[0, 1]
+            train_rmse = np.sqrt(np.mean((train_preds - train_targets) ** 2))
+            train_mae = np.mean(np.abs(train_preds - train_targets))
+            train_regr = linear_model.LinearRegression()
+            x_train = train_preds.reshape(-1, 1)
+            y_train = train_targets.reshape(-1, 1)
+            train_regr.fit(x_train, y_train)
+            y_train_ = train_regr.predict(x_train)
+            train_sd = np.sqrt(np.sum((y_train - y_train_) ** 2) / (len(y_train) - 1.0))
+            train_metrics_history.append([epoch, train_pearson, train_rmse, train_mae, train_sd])
+            
+            if epoch >= SAVE_EPOCHS:
+                model.eval()
+                preds = []
+                targets = []
+                
+                # Validation loop with progress bar
+                val_pbar = tqdm(val_loader, desc=f"F{fold+1}E{epoch:03d} Val", leave=False, unit="batch")
+                with torch.no_grad():
+                    for xb, yb in val_pbar:
+                        xb, yb = xb.to(device), yb.to(device)
+                        with autocast():
+                            pred = model(xb)
+                        preds.append(pred.cpu().numpy())
+                        targets.append(yb.cpu().numpy())
+                val_pbar.close()
+                
+                preds = np.concatenate(preds).flatten()
+                targets = np.concatenate(targets).flatten()
+                pearson = np.corrcoef(preds, targets)[0, 1]
+                rmse = np.sqrt(np.mean((preds - targets) ** 2))
+                mae = np.mean(np.abs(preds - targets))
+                
+                regr = linear_model.LinearRegression()
+                x = preds.reshape(-1, 1)
+                y = targets.reshape(-1, 1)
+                regr.fit(x, y)
+                y_ = regr.predict(x)
+                sd = np.sqrt(np.sum((y - y_) ** 2) / (len(y) - 1.0))
 
+                val_metrics_history.append([epoch, pearson, rmse, mae, sd])
 
-        if epoch >= SAVE_EPOCHS:
-            model.eval()
-            preds = []
-            targets = []
-            with torch.no_grad():
-                for xb, yb in tqdm(test_loader, desc=f"CASF2016 Pearson {epoch:03d}", leave=False):
-                    xb, yb = xb.to(device), yb.to(device)
-                    with autocast():
-                        pred = model(xb)
-                    preds.append(pred.cpu().numpy())
-                    targets.append(yb.cpu().numpy())
-            preds = np.concatenate(preds).flatten() 
-            targets = np.concatenate(targets).flatten()
-            pearson = np.corrcoef(preds, targets)[0, 1]
-            rmse = np.sqrt(np.mean((preds - targets) ** 2))
-            mae = np.mean(np.abs(preds - targets))
-            regr = linear_model.LinearRegression()
-            x = preds.reshape(-1, 1)
-            y = targets.reshape(-1, 1)
-            regr.fit(x, y)
-            y_ = regr.predict(x)
-            sd = np.sqrt(np.sum((y - y_) ** 2) / (len(y) - 1.0))
-            test_metrics_history.append([epoch, pearson, rmse, mae, sd])  
+                # Test evaluation with progress bar
+                model.eval()
+                test_preds = []
+                test_targets = []
+                
+                test_pbar = tqdm(test_loader, desc=f"F{fold+1}E{epoch:03d} Test", leave=False, unit="batch")
+                with torch.no_grad():
+                    for xb, yb in test_pbar:
+                        xb, yb = xb.to(device), yb.to(device)
+                        with autocast():
+                            pred = model(xb)
+                        test_preds.append(pred.cpu().numpy())
+                        test_targets.append(yb.cpu().numpy())
+                test_pbar.close()
+                
+                test_preds = np.concatenate(test_preds).flatten() 
+                test_targets = np.concatenate(test_targets).flatten()
+                test_pearson = np.corrcoef(test_preds, test_targets)[0, 1]
+                test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
+                test_mae = np.mean(np.abs(test_preds - test_targets))
+                test_regr = linear_model.LinearRegression()
+                test_x = test_preds.reshape(-1, 1)
+                test_y = test_targets.reshape(-1, 1)
+                test_regr.fit(test_x, test_y)
+                test_y_ = test_regr.predict(test_x)
+                test_sd = np.sqrt(np.sum((test_y - test_y_) ** 2) / (len(test_y) - 1.0))
+                test_metrics_history.append([epoch, test_pearson, test_rmse, test_mae, test_sd])  
 
-            if pearson > best_pearson:
-                best_pearson = pearson
-                torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/weights_{epoch:03d}-{pearson:.4f}.pt')
+                # Save best model for this fold
+                if test_pearson > best_fold_pearson:
+                    best_fold_pearson = test_pearson
+                    # Save to fold-specific directory
+                    torch.save(model.state_dict(), f'{fold_model_dir}/best_weights_epoch{epoch:03d}_pearson{test_pearson:.4f}.pt')
+                    # Also save config info
+                    model_info = {
+                        'epoch': epoch,
+                        'test_pearson': test_pearson,
+                        'val_pearson': pearson,
+                        'train_pearson': train_pearson,
+                        'fold': fold + 1,
+                        'model_config': {
+                            'dropout': args.dropout,
+                            'batch_size': args.batch,
+                            'learning_rate': args.lr
+                        }
+                    }
+                    np.save(f'{fold_model_dir}/best_model_info.npy', model_info)
+                
+                # Update overall best
+                if test_pearson > best_overall_pearson:
+                    best_overall_pearson = test_pearson
+                    best_fold = fold + 1
+                    # Save overall best model
+                    torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/best_overall_weights.pt')
+                    # Copy to main model directory as well
+                    torch.save(model.state_dict(), f'{fold_model_dir}/overall_best_weights.pt')
 
-        np.save('src/sfcnn/src/train_results/train_metrics_history.npy', np.array(train_metrics_history))
-        np.save('src/sfcnn/src/train_results/val_metrics_history.npy', np.array(val_metrics_history))
-        np.save('src/sfcnn/src/train_results/test_metrics_history.npy', np.array(test_metrics_history))
+            # Update main progress bar with current metrics
+            tqdm.write(f"F{fold+1}E{epoch:03d} | Train: P={train_pearson:.4f} L={train_loss:.4f} | " +
+                      (f"Val: P={pearson:.4f} | Test: P={test_pearson:.4f}" if epoch >= SAVE_EPOCHS else ""))
+
+        # Save fold results to fold-specific directory
+        np.save(f'{fold_metrics_dir}/train_metrics_history.npy', np.array(train_metrics_history))
+        np.save(f'{fold_metrics_dir}/val_metrics_history.npy', np.array(val_metrics_history))
+        np.save(f'{fold_metrics_dir}/test_metrics_history.npy', np.array(test_metrics_history))
+        np.save(f'{fold_metrics_dir}/train_loss_history.npy', np.array(train_loss_history))
+        
+        # Save final model state
+        torch.save(model.state_dict(), f'{fold_model_dir}/final_weights_epoch{TRAIN_EPOCHS}.pt')
+        
+        # Save fold summary
+        fold_summary = {
+            'fold': fold + 1,
+            'best_test_pearson': best_fold_pearson,
+            'final_val_pearson': val_metrics_history[-1][1] if val_metrics_history else 0,
+            'final_test_pearson': test_metrics_history[-1][1] if test_metrics_history else 0,
+            'final_train_pearson': train_metrics_history[-1][1] if train_metrics_history else 0,
+            'total_epochs': TRAIN_EPOCHS,
+            'train_samples': len(train_fold_idx),
+            'val_samples': len(val_fold_idx),
+            'hyperparameters': {
+                'batch_size': args.batch,
+                'dropout': args.dropout,
+                'learning_rate': args.lr,
+                'epochs': TRAIN_EPOCHS
+            }
+        }
+        np.save(f'{fold_dir}/fold_summary.npy', fold_summary)
+        
+        fold_results.append(fold_summary)
+        
+        print(f'Fold {fold + 1} completed. Best test Pearson: {best_fold_pearson:.4f}')
+        print(f'Results saved to: {fold_dir}')
+
+    # Print cross-validation summary
+    print(f'\nCross-Validation Results Summary:')
+    print('-' * 50)
+    test_pearsons = [result['best_test_pearson'] for result in fold_results]
+    print(f'Mean Test Pearson: {np.mean(test_pearsons):.4f} ± {np.std(test_pearsons):.4f}')
+    print(f'Best Overall Pearson: {best_overall_pearson:.4f} (Fold {best_fold})')
+    
+    # Save comprehensive cross-validation summary
+    cv_summary = {
+        'fold_results': fold_results,
+        'mean_test_pearson': np.mean(test_pearsons),
+        'std_test_pearson': np.std(test_pearsons),
+        'best_overall_pearson': best_overall_pearson,
+        'best_fold': best_fold,
+        'total_train_samples': len(all_train_idx),
+        'total_test_samples': len(test_idx),
+        'cv_config': {
+            'k_folds': args.k_folds,
+            'random_state': 1234,
+            'shuffle': True
+        },
+        'global_hyperparameters': {
+            'batch_size': args.batch,
+            'dropout': args.dropout,
+            'learning_rate': args.lr,
+            'epochs': TRAIN_EPOCHS
+        }
+    }
+    np.save('src/sfcnn/src/train_results/cv_results/cv_summary.npy', cv_summary)
+    
+    # Also save a backup in the main results directory
+    np.save('src/sfcnn/src/train_results/cv_summary.npy', cv_summary)
+    
+    print(f'\nAll results saved to: src/sfcnn/src/train_results/cv_results/')

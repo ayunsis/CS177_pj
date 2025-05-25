@@ -43,7 +43,7 @@ class HDF5GridDataset(Dataset):
             return grid
         
 
-MODEL_PATH = 'src/AF3_eval/model/pearson-0.7686.pt'
+MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/best_overall_weights.pt'
 CORE_GRIDS = r'data/chai_hdf5/core_grids.h5'
 CORE_2016_LABEL = r'data/chai_hdf5/core_2016_label.h5'
 CORE_sfcnn_LABEL = r'data/chai_hdf5/core_sfcnn_label.h5'
