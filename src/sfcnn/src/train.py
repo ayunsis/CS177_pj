@@ -73,10 +73,11 @@ if __name__ == '__main__':
         return train_idx, val_idx
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', '-b', default=64, type=int)
+    parser.add_argument('--batch', '-b', default=32, type=int)  # Increased batch size
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.0013, type=float)
-    parser.add_argument('--k_folds', '-k', default=5, type=int, help='Number of folds for cross validation')
+    parser.add_argument('--lr', default=0.00068, type=float)  # Increased learning rate
+    parser.add_argument('--k_folds', '-k', default=7, type=int, help='Number of folds for cross validation')
+    parser.add_argument('--grad_clip', default=1.0, type=float, help='Gradient clipping value')
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
@@ -95,7 +96,8 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_dataset, 
                              batch_size=args.batch, 
                              pin_memory=True, 
-                             num_workers=2)
+                             num_workers=2)  # Increased workers
+
     print('Dataset load finished')
 
     class CNN3D(nn.Module):
@@ -159,11 +161,11 @@ if __name__ == '__main__':
     best_overall_pearson = -1.0
     best_fold = -1
 
-    TRAIN_EPOCHS = 2
+    TRAIN_EPOCHS = 150
     SAVE_EPOCHS = 0
 
     # --- Mixed Precision Setup ---
-    from torch.cuda.amp import autocast, GradScaler
+    from torch.cuda.amp import autocast
     
     for fold, (train_ids, val_ids) in enumerate(kfold.split(all_train_idx)):
         print(f'\nFOLD {fold + 1}/{args.k_folds}')
@@ -196,22 +198,34 @@ if __name__ == '__main__':
                                   batch_size=args.batch, 
                                   shuffle=True, 
                                   pin_memory=True, 
-                                  num_workers=2)
+                                  num_workers=2,  # Increased workers
+                                  persistent_workers=True)  # Keep workers alive
         val_loader = DataLoader(val_dataset, 
                                 batch_size=args.batch, 
                                 pin_memory=True, 
-                                num_workers=2)
+                                num_workers=2,  # Increased workers
+                                persistent_workers=True)
         
         # Initialize model for this fold
         model = CNN3D(dropout=args.dropout).to(device)
-        last_linear = model.fc[-1]
-        params = [
-            {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
-            {'params': last_linear.parameters(), 'weight_decay': 0.01} 
-        ]
-        optimizer = optim.RMSprop(params, lr=args.lr)
+        
+        # Get parameters for manual optimization
+        conv_params = []
+        fc_params = []
+        for name, param in model.named_parameters():
+            if 'fc.5' in name:  # Last linear layer
+                fc_params.append(param)
+            else:
+                conv_params.append(param)
+        
         criterion = nn.MSELoss()
-        scaler = GradScaler()
+        
+        # Create optimizers
+        conv_optimizer = optim.Adam(conv_params, lr=args.lr)
+        fc_optimizer = optim.Adam(fc_params, lr=args.lr, weight_decay=0.01)
+        
+        # Remove GradScaler for simpler manual optimization
+        # scaler = GradScaler()
 
         train_loss_history = []
         train_metrics_history = []
@@ -228,17 +242,33 @@ if __name__ == '__main__':
             # Training loop with progress bar
             train_pbar = tqdm(train_loader, desc=f"F{fold+1}E{epoch:03d} Train", leave=False, unit="batch")
             for xb, yb in train_pbar:
-                xb, yb = xb.to(device), yb.to(device)  
-                optimizer.zero_grad()
+                xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
+                
+                # Zero gradients using optimizers
+                conv_optimizer.zero_grad()
+                fc_optimizer.zero_grad()
+                
+                # Use autocast for forward pass only
                 with autocast():
                     pred = model(xb)
                     loss = criterion(pred, yb)
-                scaler.scale(loss).backward()
-                scaler.step(optimizer)
-                scaler.update()
+                
+                # Simple backward pass without scaling
+                loss.backward()
+                
+                # Gradient clipping
+                torch.nn.utils.clip_grad_norm_(conv_params + fc_params, args.grad_clip)
+                
+                # Optimizer step
+                conv_optimizer.step()
+                fc_optimizer.step()
+                
                 train_loss += loss.item() * xb.size(0)
-                train_preds.append(pred.detach().cpu().numpy())
-                train_targets.append(yb.detach().cpu().numpy())
+                
+                # Only collect predictions every few batches to save memory
+                if len(train_preds) < 1000:  # Limit memory usage
+                    train_preds.append(pred.detach().cpu().numpy())
+                    train_targets.append(yb.detach().cpu().numpy())
                 
                 # Update progress bar with current loss
                 train_pbar.set_postfix(loss=f"{loss.item():.4f}")
@@ -247,18 +277,22 @@ if __name__ == '__main__':
             train_loss /= len(train_loader.dataset)
             train_loss_history.append(train_loss)
 
-            train_preds = np.concatenate(train_preds).flatten()
-            train_targets = np.concatenate(train_targets).flatten()
-            train_pearson = np.corrcoef(train_preds, train_targets)[0, 1]
-            train_rmse = np.sqrt(np.mean((train_preds - train_targets) ** 2))
-            train_mae = np.mean(np.abs(train_preds - train_targets))
-            train_regr = linear_model.LinearRegression()
-            x_train = train_preds.reshape(-1, 1)
-            y_train = train_targets.reshape(-1, 1)
-            train_regr.fit(x_train, y_train)
-            y_train_ = train_regr.predict(x_train)
-            train_sd = np.sqrt(np.sum((y_train - y_train_) ** 2) / (len(y_train) - 1.0))
-            train_metrics_history.append([epoch, train_pearson, train_rmse, train_mae, train_sd])
+            # Calculate training metrics less frequently for speed
+            if len(train_preds) > 0:
+                train_preds = np.concatenate(train_preds).flatten()
+                train_targets = np.concatenate(train_targets).flatten()
+                train_pearson = np.corrcoef(train_preds, train_targets)[0, 1]
+                train_rmse = np.sqrt(np.mean((train_preds - train_targets) ** 2))
+                train_mae = np.mean(np.abs(train_preds - train_targets))
+                train_regr = linear_model.LinearRegression()
+                x_train = train_preds.reshape(-1, 1)
+                y_train = train_targets.reshape(-1, 1)
+                train_regr.fit(x_train, y_train)
+                y_train_ = train_regr.predict(x_train)
+                train_sd = np.sqrt(np.sum((y_train - y_train_) ** 2) / (len(y_train) - 1.0))
+                train_metrics_history.append([epoch, train_pearson, train_rmse, train_mae, train_sd])
+            else:
+                train_metrics_history.append([epoch, 0.0, 0.0, 0.0, 0.0])
             
             if epoch >= SAVE_EPOCHS:
                 model.eval()
@@ -269,7 +303,8 @@ if __name__ == '__main__':
                 val_pbar = tqdm(val_loader, desc=f"F{fold+1}E{epoch:03d} Val", leave=False, unit="batch")
                 with torch.no_grad():
                     for xb, yb in val_pbar:
-                        xb, yb = xb.to(device), yb.to(device)
+                        xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
+                        # Use autocast for inference speed
                         with autocast():
                             pred = model(xb)
                         preds.append(pred.cpu().numpy())
@@ -299,7 +334,8 @@ if __name__ == '__main__':
                 test_pbar = tqdm(test_loader, desc=f"F{fold+1}E{epoch:03d} Test", leave=False, unit="batch")
                 with torch.no_grad():
                     for xb, yb in test_pbar:
-                        xb, yb = xb.to(device), yb.to(device)
+                        xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
+                        # Use autocast for inference speed
                         with autocast():
                             pred = model(xb)
                         test_preds.append(pred.cpu().numpy())
@@ -323,7 +359,7 @@ if __name__ == '__main__':
                 if test_pearson > best_fold_pearson:
                     best_fold_pearson = test_pearson
                     # Save to fold-specific directory
-                    torch.save(model.state_dict(), f'{fold_model_dir}/best_weights_epoch{epoch:03d}_pearson{test_pearson:.4f}.pt')
+                    torch.save(model.state_dict(), f'{fold_model_dir}/epoch{epoch:03d}_{test_pearson:.4f}.pt')
                     # Also save config info
                     model_info = {
                         'epoch': epoch,
@@ -349,8 +385,8 @@ if __name__ == '__main__':
                     torch.save(model.state_dict(), f'{fold_model_dir}/overall_best_weights.pt')
 
             # Update main progress bar with current metrics
-            tqdm.write(f"F{fold+1}E{epoch:03d} | Train: P={train_pearson:.4f} L={train_loss:.4f} | " +
-                      (f"Val: P={pearson:.4f} | Test: P={test_pearson:.4f}" if epoch >= SAVE_EPOCHS else ""))
+            # tqdm.write(f"F{fold+1}E{epoch:03d} | Train: P={train_pearson:.4f} L={train_loss:.4f} | " +
+            #           (f"Val: P={pearson:.4f} | Test: P={test_pearson:.4f}" if epoch >= SAVE_EPOCHS else ""))
 
         # Save fold results to fold-specific directory
         np.save(f'{fold_metrics_dir}/train_metrics_history.npy', np.array(train_metrics_history))

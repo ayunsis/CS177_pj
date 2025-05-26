@@ -44,6 +44,7 @@ class HDF5GridDataset(Dataset):
         
 
 MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/best_overall_weights.pt'
+CURRENT_BEST = 'src/AF3_eval/model/pearson-0.7686.pt'
 CORE_GRIDS = r'data/chai_hdf5/core_grids.h5'
 CORE_2016_LABEL = r'data/chai_hdf5/core_2016_label.h5'
 CORE_sfcnn_LABEL = r'data/chai_hdf5/core_sfcnn_label.h5'
@@ -53,7 +54,7 @@ with h5py.File(CORE_GRIDS, 'r') as f:
 test_idx = np.arange(test_len)
 
 
-model = predict.build_model(MODEL_PATH, dropout=0.15)
+model = predict.build_model(CURRENT_BEST, dropout=0.15)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 model.eval()

@@ -61,7 +61,7 @@ heatmap_data = pd.DataFrame({
     'sfcnn_gap': sfcnn_df.loc[top20_idx, 'gap'].values,
     'gap_diff': sfcnn_core_gap.loc[top20_idx].values,
 }, index=core2016_df.loc[top20_idx, 'pdbid'])
-heatmap_data = heatmap_data.sort_values(by='core2016_gap', ascending=False)
+heatmap_data = heatmap_data.sort_values(by='gap_diff', ascending=False)
 
 plt.figure(figsize=(12, 8))
 sns.heatmap(heatmap_data, annot=True, cmap='plasma', fmt=".2f", alpha=0.85, linewidths=0.5, linecolor='white', cbar_kws={'label': 'Gap Value'})

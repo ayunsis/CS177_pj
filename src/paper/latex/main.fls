@@ -1226,6 +1226,16 @@ INPUT ./images/CNN.png
 INPUT ./images/CNN.png
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
+INPUT ./images/reproduction_metrics_comparison_seaborn.png
+INPUT ./images/reproduction_metrics_comparison_seaborn.png
+INPUT images/reproduction_metrics_comparison_seaborn.png
+INPUT ./images/reproduction_metrics_comparison_seaborn.png
+INPUT ./images/reproduction_metrics_comparison_seaborn.png
+INPUT ./images/reproduction_scatter_seaborn.png
+INPUT ./images/reproduction_scatter_seaborn.png
+INPUT images/reproduction_scatter_seaborn.png
+INPUT ./images/reproduction_scatter_seaborn.png
+INPUT ./images/reproduction_scatter_seaborn.png
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmr7.tfm
 INPUT ./images/normal_converge.png
 INPUT ./images/normal_converge.png

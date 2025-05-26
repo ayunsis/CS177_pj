@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.3.1)  23 MAY 2025 10:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.3.1)  26 MAY 2025 15:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -858,16 +858,16 @@ Overfull \hbox (2.4767pt too wide) in paragraph at lines 107--118
  [][] 
  []
 
-
-Underfull \hbox (badness 1092) in paragraph at lines 151--153
-[]\OT1/cmr/m/n/7.52812 Although the original Sfcnn reports superior metrics, its
- []
-
-
-Underfull \hbox (badness 3601) in paragraph at lines 151--153
-\OT1/cmr/m/n/7.52812 training process did not converge in the reproduction,
- []
-
+<images/reproduction_metrics_comparison_seaborn.png, id=164, 578.16pt x 361.35pt>
+File: images/reproduction_metrics_comparison_seaborn.png Graphic file (type png)
+<use images/reproduction_metrics_comparison_seaborn.png>
+Package pdftex.def Info: images/reproduction_metrics_comparison_seaborn.png  used on input line 155.
+(pdftex.def)             Requested size: 195.39702pt x 122.11853pt.
+<images/reproduction_scatter_seaborn.png, id=165, 505.89pt x 505.89pt>
+File: images/reproduction_scatter_seaborn.png Graphic file (type png)
+<use images/reproduction_scatter_seaborn.png>
+Package pdftex.def Info: images/reproduction_scatter_seaborn.png  used on input line 161.
+(pdftex.def)             Requested size: 170.97798pt x 170.98137pt.
 
 Overfull \hbox (253.25pt too wide) has occurred while \output is active
 [][][] 
@@ -880,57 +880,43 @@ Overfull \vbox (1.0pt too high) has occurred while \output is active []
 Non-PDF special ignored!
 <special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
  <./images/one_hot.png> <./images/CNN.png>]
-<images/normal_converge.png, id=185, 867.24pt x 578.16pt>
+Underfull \hbox (badness 1092) in paragraph at lines 166--168
+[]\OT1/cmr/m/n/7.52812 Although the original Sfcnn reports superior metrics, its
+ []
+
+
+Underfull \hbox (badness 3601) in paragraph at lines 166--168
+\OT1/cmr/m/n/7.52812 training process did not converge in the reproduction,
+ []
+
+<images/normal_converge.png, id=187, 867.24pt x 578.16pt>
 File: images/normal_converge.png Graphic file (type png)
 <use images/normal_converge.png>
-Package pdftex.def Info: images/normal_converge.png  used on input line 160.
+Package pdftex.def Info: images/normal_converge.png  used on input line 172.
 (pdftex.def)             Requested size: 219.8235pt x 146.54224pt.
-<images/origin_param.png, id=186, 867.24pt x 578.16pt>
+<images/origin_param.png, id=188, 867.24pt x 578.16pt>
 File: images/origin_param.png Graphic file (type png)
 <use images/origin_param.png>
-Package pdftex.def Info: images/origin_param.png  used on input line 166.
+Package pdftex.def Info: images/origin_param.png  used on input line 178.
 (pdftex.def)             Requested size: 219.8235pt x 146.54224pt.
 
-Underfull \hbox (badness 1776) in paragraph at lines 178--179
+Underfull \hbox (badness 1776) in paragraph at lines 190--191
 \OT1/cmr/m/n/7.52812 more than five isomorphic or heterogeneous chains were
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \hbox (badness 7981) in paragraph at lines 206--215
+Underfull \hbox (badness 7981) in paragraph at lines 218--227
 \OT1/cmr/m/n/7.52812 To quantitatively assess the reliability of AlphaFold3
  []
 
 
-Underfull \hbox (badness 1448) in paragraph at lines 206--215
+Underfull \hbox (badness 1448) in paragraph at lines 218--227
 \OT1/cmr/m/n/7.52812 truth. For benchmarking, the predicted scores for AF3-
  []
 
 
-Underfull \hbox (badness 1092) in paragraph at lines 206--215
+Underfull \hbox (badness 1092) in paragraph at lines 218--227
 \OT1/cmr/m/n/7.52812 truth and the Sfcnn scores obtained from experimentally
- []
-
-
-Underfull \hbox (badness 2951) in paragraph at lines 218--218
-[]\OT1/cmr/bx/n/7 Table 4. \OT1/cmr/m/n/7 Performance metrics for AF3-predicted structures
- []
-
-<images/top20_heatmap.png, id=194, 800.7516pt x 578.16pt>
-File: images/top20_heatmap.png Graphic file (type png)
-<use images/top20_heatmap.png>
-Package pdftex.def Info: images/top20_heatmap.png  used on input line 240.
-(pdftex.def)             Requested size: 166.08821pt x 119.91743pt.
-<images/gap_histogram.png, id=195, 867.24pt x 505.89pt>
-File: images/gap_histogram.png Graphic file (type png)
-<use images/gap_histogram.png>
-Package pdftex.def Info: images/gap_histogram.png  used on input line 241.
-(pdftex.def)             Requested size: 166.08821pt x 96.8843pt.
-
-Underfull \hbox (badness 1024) in paragraph at lines 242--242
-\OT1/cmr/m/n/6.02249 gaps and histogram (bottom) of absolute prediction gaps for AF3
  []
 
 
@@ -944,65 +930,63 @@ Overfull \vbox (1.0pt too high) has occurred while \output is active []
  [3
 Non-PDF special ignored!
 <special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
- <./images/normal_converge.png> <./images/origin_param.png>]
-Underfull \hbox (badness 3954) in paragraph at lines 246--247
-[]\OT1/cmr/m/n/7.52812 Figures []5[] illustrate the distribution and magnitude of
+ <./images/reproduction_metrics_comparison_seaborn.png> <./images/reproduction_scatter_seaborn.png> <./images/normal_converge.png> <./images/origin_param.png>]
+Underfull \hbox (badness 2951) in paragraph at lines 230--230
+[]\OT1/cmr/bx/n/7 Table 4. \OT1/cmr/m/n/7 Performance metrics for AF3-predicted structures
  []
 
-<images/gap_boxplot.png, id=211, 722.7pt x 505.89pt>
+<images/top20_heatmap.png, id=213, 867.24pt x 578.16pt>
+File: images/top20_heatmap.png Graphic file (type png)
+<use images/top20_heatmap.png>
+Package pdftex.def Info: images/top20_heatmap.png  used on input line 252.
+(pdftex.def)             Requested size: 170.97798pt x 113.98022pt.
+<images/gap_histogram.png, id=214, 867.24pt x 505.89pt>
+File: images/gap_histogram.png Graphic file (type png)
+<use images/gap_histogram.png>
+Package pdftex.def Info: images/gap_histogram.png  used on input line 253.
+(pdftex.def)             Requested size: 170.97798pt x 99.7327pt.
+
+Underfull \hbox (badness 1024) in paragraph at lines 254--254
+\OT1/cmr/m/n/6.02249 gaps and histogram (bottom) of absolute prediction gaps for AF3
+ []
+
+
+Underfull \hbox (badness 3954) in paragraph at lines 258--259
+[]\OT1/cmr/m/n/7.52812 Figures []7[] illustrate the distribution and magnitude of
+ []
+
+<images/gap_boxplot.png, id=216, 722.7pt x 505.89pt>
 File: images/gap_boxplot.png Graphic file (type png)
 <use images/gap_boxplot.png>
-Package pdftex.def Info: images/gap_boxplot.png  used on input line 250.
-(pdftex.def)             Requested size: 166.08821pt x 116.25961pt.
-<images/gap_violinplot.png, id=212, 722.7pt x 505.89pt>
+Package pdftex.def Info: images/gap_boxplot.png  used on input line 262.
+(pdftex.def)             Requested size: 195.39702pt x 136.77737pt.
+<images/gap_violinplot.png, id=217, 722.7pt x 505.89pt>
 File: images/gap_violinplot.png Graphic file (type png)
 <use images/gap_violinplot.png>
-Package pdftex.def Info: images/gap_violinplot.png  used on input line 251.
-(pdftex.def)             Requested size: 166.08821pt x 116.25961pt.
+Package pdftex.def Info: images/gap_violinplot.png  used on input line 263.
+(pdftex.def)             Requested size: 195.39702pt x 136.77737pt.
 
-Underfull \hbox (badness 5847) in paragraph at lines 259--267
+Underfull \hbox (badness 5847) in paragraph at lines 271--277
 \OT1/cmr/m/n/7.52812 Collectively, these results demonstrate that while the
  []
 
 
-Underfull \hbox (badness 3291) in paragraph at lines 259--267
-\OT1/cmr/m/n/7.52812 experimental affinities on the CASF-2016 core set, its
+Underfull \hbox (badness 3240) in paragraph at lines 271--277
+\OT1/cmr/m/n/7.52812 performance deteriorates when applied to AF3-predicted
  []
 
 
-Overfull \hbox (6.13817pt too wide) in paragraph at lines 272--273
-[]\OT1/cmr/bx/n/7.52812 Protein Structure-Specific Limitations: \OT1/cmr/m/n/7.52812 Certain proteins
+Overfull \hbox (4.70392pt too wide) in paragraph at lines 284--300
+ [][] 
  []
 
 
-Underfull \hbox (badness 3919) in paragraph at lines 272--273
-\OT1/cmr/m/n/7.52812 in the CASF-2016 core set may possess structural
+Underfull \hbox (badness 2894) in paragraph at lines 278--300
+[]\OT1/cmr/m/n/7.52812 The top 10 error complexes and their relative protein
  []
 
 
-Overfull \hbox (14.06815pt too wide) in paragraph at lines 272--273
-\OT1/cmr/m/n/7.52812 disordered regions, or unusual binding site conformations|that
- []
-
-
-Underfull \hbox (badness 1931) in paragraph at lines 273--274
-\OT1/cmr/m/n/7.52812 affinity estimation. Its training data, loss functions,
- []
-
-
-Underfull \hbox (badness 1147) in paragraph at lines 273--274
-\OT1/cmr/m/n/7.52812 and architectural choices may not capture the subtle
- []
-
-
-Overfull \hbox (2.74861pt too wide) in paragraph at lines 279--284
-\OT1/cmr/m/n/7.52812 predicted protein structures for protein-ligand affinity prediction
- []
-
-
-Underfull \hbox (badness 6204) in paragraph at lines 290--291
-\OT1/cmr/m/n/7.52812 dataset curation, preprocessing, featurization, data
- []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Overfull \hbox (253.25pt too wide) has occurred while \output is active
@@ -1016,67 +1000,136 @@ Overfull \vbox (1.0pt too high) has occurred while \output is active []
 Non-PDF special ignored!
 <special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
  <./images/top20_heatmap.png> <./images/gap_histogram.png> <./images/gap_boxplot.png> <./images/gap_violinplot.png>]
-Underfull \hbox (badness 2435) in paragraph at lines 292--293
+Underfull \hbox (badness 2285) in paragraph at lines 303--308
+\OT1/cmr/m/n/7.52812 from incapability of handling certain particular complex
+ []
+
+
+Overfull \hbox (6.13817pt too wide) in paragraph at lines 313--314
+[]\OT1/cmr/bx/n/7.52812 Protein Structure-Specific Limitations: \OT1/cmr/m/n/7.52812 Certain proteins
+ []
+
+
+Underfull \hbox (badness 3919) in paragraph at lines 313--314
+\OT1/cmr/m/n/7.52812 in the CASF-2016 core set may possess structural
+ []
+
+
+Overfull \hbox (14.06815pt too wide) in paragraph at lines 313--314
+\OT1/cmr/m/n/7.52812 disordered regions, or unusual binding site conformations|that
+ []
+
+
+Underfull \hbox (badness 1931) in paragraph at lines 314--315
+\OT1/cmr/m/n/7.52812 affinity estimation. Its training data, loss functions,
+ []
+
+
+Underfull \hbox (badness 1147) in paragraph at lines 314--315
+\OT1/cmr/m/n/7.52812 and architectural choices may not capture the subtle
+ []
+
+
+Overfull \hbox (2.74861pt too wide) in paragraph at lines 320--325
+\OT1/cmr/m/n/7.52812 predicted protein structures for protein-ligand affinity prediction
+ []
+
+
+Underfull \hbox (badness 6204) in paragraph at lines 331--332
+\OT1/cmr/m/n/7.52812 dataset curation, preprocessing, featurization, data
+ []
+
+
+Underfull \hbox (badness 2435) in paragraph at lines 333--334
 []\OT1/cmr/m/n/7.52812 Designed and maintained the entire AF3 generation-
  []
 
 
-Underfull \hbox (badness 5359) in paragraph at lines 298--299
+Underfull \hbox (badness 5359) in paragraph at lines 339--340
 []\OT1/cmr/m/n/7.52812 Designed and executed evaluation process for both
  []
 
 
-Underfull \hbox (badness 3343) in paragraph at lines 315--317
+Underfull \hbox (badness 3343) in paragraph at lines 356--358
 []\OT1/cmr/m/n/7.52812 The project was conducted collaboratively with regular
  []
 
 
-Overfull \hbox (0.98755pt too wide) in paragraph at lines 328--332
+Overfull \hbox (0.98755pt too wide) in paragraph at lines 369--373
 \OT1/cmr/m/n/7.52812 Bioinformatics|Software Development and Applications course
  []
 
-(./main.bbl)
-[leftcolumn badness]: 1000000 on 6.91823pt
-[rightcolumn badness]: 1000000 on 6.91823pt
-[leftcolumn badness]: 1000000 on 6.91823pt
-[rightcolumn badness]: 1000000 on 6.91823pt
+(./main.bbl
+Overfull \hbox (253.25pt too wide) has occurred while \output is active
+[][][] 
+ []
+
+
+Overfull \vbox (1.0pt too high) has occurred while \output is active []
+
+ [5
+Non-PDF special ignored!
+<special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
+])
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
+[leftcolumn badness]: 10000 on 21.41823pt
+[rightcolumn badness]: 1000000 on 21.41823pt
 - LAST -
-Extra skip:0.0pt
-Left:329.96379pt/0.0pt
-Right:335.0pt/1.88202pt
-Split: 335.25pt
-Output:335.25pt
+Extra skip:20.58177pt
+Left:41.5pt/1.46379pt
+Right:20.5pt/1.88202pt
+Split: 42.25pt
+Output:42.25pt
 Pageshrink: 0.0pt
 Pagestretch: 0.0pt
 @colht:671.5pt
-FLUSHEND [output]: 335.25pt
-FLUSHEND [leftcolumn badness]: 20
-FUSHEND [rightcolumn badness]: 0
+FLUSHEND [output]: 42.25pt
+FLUSHEND [leftcolumn badness]: 10000
+FUSHEND [rightcolumn badness]: 10000
 
 Overfull \hbox (253.25pt too wide) has occurred while \output is active
 [][][] 
  []
 
-[5
+[6
 Non-PDF special ignored!
 <special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
 ] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 5677AF41EDDBFFBB28E8042666A1310C;4329.
+(rerunfilecheck)             Checksum: 42BBC5017A6446FDFEC0B1529664FC98;4314.
  ) 
 Here is how much of TeX's memory you used:
- 25712 strings out of 476025
- 476437 string characters out of 5794016
- 1871382 words of memory out of 5000000
- 45624 multiletter control sequences out of 15000+600000
+ 25733 strings out of 476025
+ 477229 string characters out of 5794016
+ 1873382 words of memory out of 5000000
+ 45639 multiletter control sequences out of 15000+600000
  542798 words of font info for 152 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
- 99i,13n,94p,17429b,503s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,13n,94p,17429b,547s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmb10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb>
-Output written on main.pdf (5 pages, 1931021 bytes).
+Output written on main.pdf (6 pages, 2290273 bytes).
 PDF statistics:
- 339 PDF objects out of 1000 (max. 8388607)
- 269 compressed objects within 3 object streams
- 61 named destinations out of 1000 (max. 500000)
- 285 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 351 PDF objects out of 1000 (max. 8388607)
+ 276 compressed objects within 3 object streams
+ 65 named destinations out of 1000 (max. 500000)
+ 295 words of extra memory for PDF output out of 10000 (max. 10000000)
 
