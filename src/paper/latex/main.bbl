@@ -20,4 +20,9 @@ Yu~Wang, Zhengxiao Wei, and Lei Xi.
 \newblock Sfcnn: a novel scoring function based on 3d convolutional neural network for accurate and stable protein–ligand affinity prediction.
 \newblock {\em BMC Bioinformatics}, 23(1):222, 2022.
 
+\bibitem{Zheng2025.04.07.647682}
+Haiyang Zheng, Hanfeng Lin, Adebowale~A. Alade, Jingjing Chen, Erika~Y. Monroy, Min Zhang, and Jin Wang.
+\newblock Alphafold3 in drug discovery: A comprehensive assessment of capabilities, limitations, and applications.
+\newblock {\em bioRxiv}, 2025.
+
 \end{thebibliography}

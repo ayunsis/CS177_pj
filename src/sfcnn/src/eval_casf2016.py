@@ -9,7 +9,7 @@ from train import HDF5GridDataset
 import matplotlib.pyplot as plt
 import scipy
 
-MODEL_PATH = 'src/sfcnn/src/train_results/cnnmodel/best_overall_weights.pt'
+MODEL_PATH = 'src/sfcnn/src/train_results/valuable_models/pearson-0.7686.pt'
 
 
 CORE_GRIDS = r'data/test_hdf5/core_grids.h5'

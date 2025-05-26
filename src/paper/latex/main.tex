@@ -37,7 +37,7 @@
 \orgaddress{\street{393 Middle Huaxia Road}, \postcode{201210}, \state{Shanghai}, \country{China}}}
 
 \abstract{
-This study systematically evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. The Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, was reproduced using PyTorch. Model performance was validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. Subsequently, AF3-derived protein structures from the CASF-2016 core set were assessed and compared to experimentally determined structures using Sfcnn scores, to determine the suitability of AF3 predictions in PLA applications.
+This study systematically evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. The Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, was reproduced using PyTorch. Model performance was validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. Subsequently, AF3-derived protein structures from the CASF-2016 core set were assessed and compared to experimentally determined structures using Sfcnn scores to determine the suitability of AF3 predictions in PLA applications.
 }
 \keywords{AlphaFold3, protein-ligand affinity, CNN scoring function, CASF-2016}
 
@@ -46,12 +46,12 @@ This study systematically evaluates the reliability of AlphaFold3 (AF3)-predicte
 \section{Introduction}
 \vspace{0.5em}
 \subsection{Background}
-AlphaFold3 (AF3), DeepMind’s latest AlphaFold model, predicts protein and protein–ligand structures with high accuracy. It extends AlphaFold2 by adding explicit ligand modeling, enhanced multimer assembly support, and optimized MSAs via deep neural networks trained on extensive sequence and structural data~\cite{AF3}.
+AlphaFold3 (AF3), DeepMind's latest AlphaFold model, predicts protein and protein–ligand structures with high accuracy. It extends AlphaFold2 by adding explicit ligand modeling, enhanced multimer assembly support, and optimized multiple sequence alignments (MSAs) via deep neural networks trained on extensive sequence and structural data~\cite{AF3}.
 
 Sfcnn is a 3D convolutional neural network-based scoring function introduced by Wang et al.~\cite{Sfcnn} in 2022, designed to provide accurate and reliable predictions of binding affinities for protein-ligand complexes.
 \vspace{0.5em}
 \subsection{Objective}
-The primary objective of this study is to evaluate the reliability of AlphaFold3-predicted protein-ligand complex structures for protein-ligand affinity (PLA) prediction. Using the Chai-1 server for AF3 structure generation, we ensure support for custom ligands and robust MSA construction. The resulting AF3 structures are assessed with the reproduced Sfcnn model and predicted affinities are compared to those from experimentally determined structures. This enables a direct evaluation of AF3's suitability for PLA prediction and highlights its current strengths and limitations.
+The primary objective of this study is to evaluate the reliability of AlphaFold3-predicted protein-ligand complex structures for protein-ligand affinity (PLA) prediction. Using the Chai-1 server for AF3 structure generation, we ensure support for custom ligands and robust MSA construction. The resulting AF3 structures are assessed with the reproduced Sfcnn model, and predicted affinities are compared to those from experimentally determined structures. This enables a direct evaluation of AF3's suitability for PLA prediction and highlights its current strengths and limitations.
 
 \section{Materials and Methods}
 \vspace{0.5em}
@@ -93,7 +93,7 @@ The PyTorch implementation closely mirrors the original TensorFlow version, with
 \end{enumerate}
 
 \subsection{Data Storage}
-The original Sfcnn implementation stored data as concatenated arrays in a single \texttt{.pkl} (pickle) file, requiring all data to reside in memory, which is impractical for extremely large datasets. The format of \texttt{.h5} (HDF5) via \texttt{h5py} is adopted for incremental writing and efficient storage. The resulting training grid occupies 40.1 GiB.
+The original Sfcnn implementation stored data as concatenated arrays in a single \texttt{.pkl} (pickle) file, requiring all data to reside in memory, which is impractical for extremely large datasets. The HDF5 format (\texttt{.h5}) via \texttt{h5py} was adopted for incremental writing and efficient storage. The resulting training grid occupies 40.1 GiB.
 
 \subsection{Training Procedure}
 Training and validation sets are partitioned as in the original study, with the validation set comprising indices 41,000 to 48,520. The resulting splits are: training $(41,000, 20,20,20,28)$, validation $(7,520, 20,20,20,28)$, and test $(285, 20,20,20,28)$, corresponding to a ratio of 84.00\% : 15.42\% : 0.58\%. 
@@ -156,15 +156,15 @@ SD & 1.3928 & 1.3252 \\
         \caption{Training curve for reproduced hyperparameters.}
         \label{fig:ReproducedPlot}
     \end{minipage}\hfill
-    \begin{minipage}{0.35\textwidth}
+    \begin{minipage}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/reproduction_scatter_seaborn.png}
         \caption{Training curve for original hyperparameters.}
         \label{fig:OriginalPlot}
     \end{minipage}
 \end{figure}
-Although the original Sfcnn reports superior metrics, its training process did not converge in the reproduction, raising concerns regarding the reproducibility of the reported performance. 
-Due to the lack of access to the original training data and the absence of author response to data requests on GitHub\footnote{\url{https://github.com/bioinfocqupt/Sfcnn/issues/1}}, the original training process is deemed irreproducible.
+Although the original Sfcnn reports superior metrics, its training process did not converge during reproduction, raising concerns regarding the reproducibility of the reported performance. 
+Due to the lack of access to the original training data and the absence of author responses to data requests on GitHub\footnote{\url{https://github.com/bioinfocqupt/Sfcnn/issues/1}}, the original training process is deemed irreproducible.
 
 The training, validation, and testing results for the four metrics are presented in Figure~\ref{fig:ReproducedPlot} and Figure~\ref{fig:OriginalPlot}.
 \begin{figure}[H]
@@ -179,10 +179,20 @@ The training, validation, and testing results for the four metrics are presented
     \caption{Training curve for original hyperparameters.}
     \label{fig:OriginaltrainPlot}
 \end{figure}
+The residuals of the test set (gaps between predicted and true values) are visualized in Figure~\ref{fig:test residuals}. 
+The histogram approximately follows a normal distribution, 
+indicating that the model's predictions are generally unbiased, with most errors concentrated around zero. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/reproduction_residuals_seaborn.png}
+    \caption{Test residual histogram}
+    \label{fig:test residuals}
+\end{figure}
 
 
-We conjuctured that the divergent result is caused by unusually high learning rate and drop out rate,
-the reproduced results are therefore considered the baseline for subsequent AF3 result assessment.
+We conjectured that the divergent results are caused by unusually high learning rate and dropout rate;
+therefore, the reproduced results are considered the baseline for subsequent AF3 result assessment.
 
 \section{AlphaFold3 Result Assessment}
 
@@ -227,31 +237,38 @@ in Section~\ref{sec:ReproducedResults}.
 
 \begin{table}[H]
 \centering
-\caption{Performance metrics for AF3-predicted structures compared to ground truth and Sfcnn predictions on the core set.}
+\caption{Performance metrics for Sfcnn AF3-predicted structures compared to Sfcnn CASF2016 and groundtruth.}
 \label{tab:af3_metrics}
 \begin{tabular}{lcc}
 \toprule
-Metric & Ground Truth & Core Set Sfcnn \\
+Metric & vs. CASF2016 Sfcnn & vs. Groundtruth \\
 \midrule
-Pearson $R$ & 0.3558 & 0.4415 \\
-RMSE        & 2.0484 & 1.1366 \\
-MAE         & 1.6616 & 0.9031 \\
-SD          & 2.0356 & 1.0665 \\
+Pearson $R$ & 0.2930 & 0.3850 \\
+RMSE        & 2.0836 & 1.1669 \\
+MAE         & 1.6933 & 0.9231 \\
+SD          & 2.0825 & 1.0970 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-As summarized in Table~\ref{tab:af3_metrics}, the correlation between predicted and experimental affinities decreases when using AF3-generated structures (Pearson $R = 0.3558$) compared to experimentally determined structures (Pearson $R = 0.4415$). Both RMSE and MAE are notably higher for AF3 predictions, indicating increased prediction error and reduced model reliability on these structures.
+As summarized in Table~\ref{tab:af3_metrics}, 
+the correlation between predicted and experimental 
+affinities decreases when using AF3-generated structures
+ (Pearson $R = 0.2930$) compared to experimentally 
+ determined structures (Pearson $R = 0.3850$). 
+ Both RMSE and MAE are notably higher for AF3 predictions, 
+ indicating increased prediction error and reduced model 
+ reliability on these structures.
 
-\subsection{Error Analysis and Visualization}
+\subsection{Residual Analysis and Visualization}
 To further dissect the sources and distribution of prediction errors, 
 a series of visual analyses are presented below:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\textwidth]{images/top20_heatmap.png}
-    \includegraphics[width=0.35\textwidth]{images/gap_histogram.png}
-    \caption{Heatmap (top) of the top 20 complexes with largest prediction gaps and histogram (bottom) of absolute prediction gaps for AF3 structures.}
+    \includegraphics[width=0.45\textwidth]{images/top20_heatmap.png}
+    \includegraphics[width=0.45\textwidth]{images/gap_histogram.png}
+    \caption{Heatmap (top) of the top 20 complexes with the largest prediction gaps and histogram (bottom) of absolute prediction gaps for AF3 structures.}
     \label{fig:af3_heatmap_hist}
 \end{figure}
 
@@ -259,13 +276,14 @@ Figures~\ref{fig:af3_heatmap_hist} illustrate the distribution and magnitude of 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{images/gap_boxplot.png}
-    \includegraphics[width=0.4\textwidth]{images/gap_violinplot.png}
-    \caption{Boxplot (top) and violin plot (bottom) of prediction gaps for AF3 structures.}
-    \label{fig:af3_gap_box_violin}
+    \includegraphics[width=0.45\textwidth]{images/gap_violinplot.png}
+    \caption{violin plot of prediction gaps for AF3 structures.}
+    \label{fig:af3_gap_violin}
 \end{figure}
 
-Figure~\ref{fig:af3_gap_box_violin} provides complementary perspectives: the boxplot summarizes the central tendency and spread, while the violin plot visualizes the full error distribution, emphasizing the presence of outliers and overall error landscape.
+Figure~\ref{fig:af3_gap_violin} provides a complementary perspective: 
+the violin plot visualizes the full error distribution, 
+emphasizing the significantly higher presence of large gaps.
 
 \subsection{Interpretation and Implications}
 Collectively, these results demonstrate that while the reproduced Sfcnn model 
@@ -275,11 +293,13 @@ The observed increase in RMSE and MAE, coupled with reduced correlation,
 indicates that current AF3 structural models introduce additional uncertainty into affinity 
 prediction pipelines.
 
-The top 10 error complexes and their relative protein structures, Chai-1 overall confidence scores
-are demonstrated in table~\ref{tab:top10_error}.
+The top 10 error complexes and their corresponding protein structures and Chai-1 overall confidence scores
+are demonstrated in Table~\ref{tab:top10_error}.
+
 \begin{table}[H]
 \centering
-\caption{Top 10 complexes with largest prediction gaps.`heter' for heterogeneous, `iso' for isomorphic.}
+\caption{Top 10 complexes with the largest prediction gaps.
+`heter' denotes heterogeneous, `iso' denotes isomorphic.}
 \label{tab:top10_error}
 \begin{tabular}{lccc}
 \toprule
@@ -291,7 +311,7 @@ PDB ID & Aggregate Score & Prediction Gap & chain structure\\
 5dwr & 0.90 & 3.44 & 1 chain\\
 4u4s & 0.89 & 3.31 & 2 heter\\
 1mq6 & 0.97 & 3.15 & 2 heter\\
-4tmn & 0.63 & 3.10 & 2 iso\\
+\textbf{4tmn} & \textbf{0.63} & \textbf{3.10} & \textbf{2 iso}\\
 4gid & 0.96 & 3.06 & 1 chain\\
 3l7b & 0.93 & 3.05 & 2 iso\\
 3utu & 0.97 & 3.00 & 2 heter\\
@@ -300,21 +320,46 @@ PDB ID & Aggregate Score & Prediction Gap & chain structure\\
 \end{table}
 
 
-Statistics of those complexes shows no significance in protein structures,
-suggesting that AF3's performance is not originated from incapability of 
-handling certain particular complex structures. On the other hand, the
-overall high aggregate scores raises concerns about the reliability of
-AF3's confidence scores under the context of PLA prediction. 
+Statistics of these complexes show no significant correlation with protein structures,
+suggesting that AF3's performance degradation is \textbf{not} attributable to the incapability of 
+handling certain particular complex structures. However, the
+overall high aggregate scores raise concerns about the reliability of
+AF3's confidence scores in the context of PLA prediction. 
 
 \subsection{Hypotheses for AF3's Reduced Performance}
-The observed decrease in PLA prediction accuracy for AF3-generated structures may be attributed to two main factors:
+The observed decrease in PLA prediction accuracy for 
+AF3-generated structures may be attributed to AF3's methodological limitations and
+constraints in the training dataset. The following hypotheses are proposed with
+reference to the work of Zheng et al.~\cite{Zheng2025.04.07.647682}:
 
 \begin{enumerate}
-    \item \textbf{Protein Structure-Specific Limitations:} Certain proteins in the CASF-2016 core set may possess structural features—such as large multimeric assemblies, flexible or disordered regions, or unusual binding site conformations—that challenge AF3's predictive capabilities. These cases can result in inaccurate modeling of the binding interface, leading to poor downstream affinity predictions.
-    \item \textbf{AF3 Model and Dataset Constraints:} AlphaFold3 was primarily optimized for general protein and protein-ligand structure prediction, not specifically for quantitative affinity estimation. Its training data, loss functions, and architectural choices may not capture the subtle determinants critical for accurate PLA prediction. The lack of explicit optimization for binding affinity tasks may limit the transferability of AF3-generated structures to deep learning-based scoring functions such as Sfcnn.
+    \item \textbf{Diffusion Module Limitations:} 
+    
+    AF3's diffusion-based architecture lacks explicit 
+    physics-based energy calculations essential for accurate binding affinity prediction. 
+    While it generates structurally plausible conformations, 
+    the absence of energy functions prevents reliable ranking 
+    of binding interactions. Additionally, 
+    the model may inadequately represent conformational 
+    ensembles due to its reliance on static crystallographic 
+    structures during training.
+
+    \item \textbf{AF3 Dataset Constraints:} 
+     
+    The training dataset exhibits temporal limitations 
+    (pre-cutoff structures only) and conformational 
+    bias toward static X-ray structures, 
+    limiting the representation of dynamic binding processes. 
+    The underrepresentation of binding affinity data and 
+    potential memorization of training structures rather 
+    than learning generalizable physical principles may 
+    contribute to reduced performance on novel 
+    protein-ligand pairs.
+
 \end{enumerate}
 
-These hypotheses suggest that both target-specific structural challenges and broader methodological limitations of AF3 contribute to the observed performance gap. Future work could involve targeted analysis of outlier complexes and the development of structure prediction models tailored for affinity prediction tasks.
+These hypotheses suggest that both target-specific structural challenges and broader methodological 
+limitations of AF3 contribute to the observed performance gap. Future work could involve targeted analysis of outlier complexes and the development of structure prediction models specifically tailored for affinity prediction tasks.
 
 \section{Conclusion}
 This study presents a systematic evaluation of AlphaFold3-predicted protein structures 
@@ -330,7 +375,7 @@ the context of PLA prediction.
 \begin{itemize}
     \item Designed and implemented the data pipeline, including dataset curation, preprocessing, featurization, data augmentation, and storage.
     \item Managed exclusion of overlapping complexes and ensured data compatibility with the reproduced network.
-    \item Designed and maintained the entire AF3 generation-evaluation workflow.
+    \item Designed and maintained the entire AF3 generation-evaluation workflow, implemented K-fold cross-validation.
 \end{itemize}
 
 \subsection{Yiming Wu}

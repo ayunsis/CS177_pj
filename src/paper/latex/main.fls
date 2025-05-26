@@ -1247,6 +1247,11 @@ INPUT ./images/origin_param.png
 INPUT images/origin_param.png
 INPUT ./images/origin_param.png
 INPUT ./images/origin_param.png
+INPUT ./images/reproduction_residuals_seaborn.png
+INPUT ./images/reproduction_residuals_seaborn.png
+INPUT images/reproduction_residuals_seaborn.png
+INPUT ./images/reproduction_residuals_seaborn.png
+INPUT ./images/reproduction_residuals_seaborn.png
 INPUT c:/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
 INPUT ./images/top20_heatmap.png
 INPUT ./images/top20_heatmap.png
@@ -1258,11 +1263,6 @@ INPUT ./images/gap_histogram.png
 INPUT images/gap_histogram.png
 INPUT ./images/gap_histogram.png
 INPUT ./images/gap_histogram.png
-INPUT ./images/gap_boxplot.png
-INPUT ./images/gap_boxplot.png
-INPUT images/gap_boxplot.png
-INPUT ./images/gap_boxplot.png
-INPUT ./images/gap_boxplot.png
 INPUT ./images/gap_violinplot.png
 INPUT ./images/gap_violinplot.png
 INPUT images/gap_violinplot.png

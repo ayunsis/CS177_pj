@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1748243934 "main.aux" "main.bbl" "main" 1748243987 0
+["bibtex main"] 1748265035 "main.aux" "main.bbl" "main" 1748265044 0
   "./reference.bib" 1748225791 5813 5496448fe464734d9acf3c5004194183 ""
   "c:/texlive/2023/texmf-dist/bibtex/bst/base/plain.bst" 1709296319 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1748243985 9302 919d5e2cdf62944983e9cb149c2933ca "pdflatex"
+  "main.aux" 1748265042 9576 d8e4df544d458e6401fd52c159406217 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1748243980 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1748243987 0
+["pdflatex"] 1748265036 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1748265044 0
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1709296399 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1709296629 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm0600.tfm" 1709296531 1536 12e8c510d3e158fdd0e9a42e75118bd9 ""
@@ -228,21 +228,21 @@
   "c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1709297760 4662804 27f73c2f767ae4579fe38abe9088e726 ""
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1709297927 7883442 5f66b8dca6fb943244df223f16609769 ""
   "c:/texlive/2023/texmf.cnf" 1709297744 713 e69b156964470283e0530f5060668171 ""
-  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1748243979 20405 88c6a646a9abcc1c9defe98aa6440c4c ""
+  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1748265027 21224 1820734f5c37700a995c0c72a180ebc9 ""
   "images/CNN.png" 1746622087 309923 19cc4d6734546d8388879aa3d7951313 ""
-  "images/gap_boxplot.png" 1747744521 99981 e621da2d7bd8a6f4d1ddeddc3b123572 ""
   "images/gap_histogram.png" 1748227750 251794 a7f5602e76ea1fb8136207267a8ae891 ""
   "images/gap_violinplot.png" 1748227751 254604 293acd4ae174f1c0336ac0f89600d8f6 ""
   "images/normal_converge.png" 1747482164 163862 3792a273763f619df6ebbc1f5cd58096 ""
   "images/one_hot.png" 1746618490 269494 13a9478612076a466c9799a527d5843b ""
   "images/origin_param.png" 1746494326 216773 f1bc5d7b8e26af14c16a48a7965a591a ""
-  "images/reproduction_metrics_comparison_seaborn.png" 1747741713 95773 e6187cf5a0b1cb4e1564b4f2f5bd8f4c ""
-  "images/reproduction_scatter_seaborn.png" 1747741781 455376 898c3df786783b34beb0c07043c1c0fb ""
-  "images/top20_heatmap.png" 1748227749 347938 03a589c25faabdc96e28cdf5a91fd151 ""
-  "main.aux" 1748243985 9302 919d5e2cdf62944983e9cb149c2933ca "pdflatex"
-  "main.bbl" 1748243934 994 0aebfb42146ea05a5d990b1bcfc699d1 "bibtex main"
-  "main.out" 1748243985 4314 42bbc5017a6446fdfec0b1529664fc98 "pdflatex"
-  "main.tex" 1748243979 20405 88c6a646a9abcc1c9defe98aa6440c4c ""
+  "images/reproduction_metrics_comparison_seaborn.png" 1748260227 93797 55c5ab95fe1fb1a6711af139f79b3081 ""
+  "images/reproduction_residuals_seaborn.png" 1748260242 105047 48d44ebc4f15755c12acdb842cdfca3c ""
+  "images/reproduction_scatter_seaborn.png" 1748260237 444723 d4c03dbd2f3bf7881119b3507615a9ad ""
+  "images/top20_heatmap.png" 1748261305 351003 947b5f8d2b88fa8d881f839536ff30d9 ""
+  "main.aux" 1748265042 9576 d8e4df544d458e6401fd52c159406217 "pdflatex"
+  "main.bbl" 1748265035 1279 efc902309cb24225102f6fd9d5ac0403 "bibtex main"
+  "main.out" 1748265042 4329 c315b59d1cd1cf637c4f2a9c7bceaad1 "pdflatex"
+  "main.tex" 1748265027 21224 1820734f5c37700a995c0c72a180ebc9 ""
   (generated)
   "main.aux"
   "main.log"
