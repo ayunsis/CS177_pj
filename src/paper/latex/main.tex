@@ -358,15 +358,29 @@ reference to the work of Zheng et al.~\cite{Zheng2025.04.07.647682}:
 
 \end{enumerate}
 
-These hypotheses suggest that both target-specific structural challenges and broader methodological 
-limitations of AF3 contribute to the observed performance gap. Future work could involve targeted analysis of outlier complexes and the development of structure prediction models specifically tailored for affinity prediction tasks.
+These hypotheses suggest that both structural prediction challenges and fundamental architectural 
+limitations of AF3 contribute to the observed performance degradation. Future improvements may require 
+integration of physics-based energy functions, enhanced conformational sampling techniques, and 
+training datasets enriched with dynamic structural information and binding affinity data.
 
 \section{Conclusion}
 This study presents a systematic evaluation of AlphaFold3-predicted protein structures 
 for protein-ligand affinity prediction using a reproduced Sfcnn model. 
-The findings highlight the importance of reproducibility in deep learning models for 
-structural biology and demonstrate the current capabilities and limitations of AF3 in 
-the context of PLA prediction. 
+Our results reveal significant performance degradation when using AF3-generated structures 
+compared to experimentally determined structures, with Pearson correlation decreasing from 
+0.768 to 0.385 and substantial increases in RMSE and MAE. 
+
+The findings highlight critical limitations of current AF3 models for affinity prediction tasks, 
+primarily attributed to the absence of physics-based energy calculations and training dataset 
+constraints biased toward static crystallographic structures. While AF3 demonstrates remarkable 
+capabilities in structural prediction, its direct application to binding affinity estimation 
+requires careful consideration of these methodological limitations.
+
+The importance of reproducibility in deep learning models for structural biology is underscored 
+by our inability to reproduce the original Sfcnn results, emphasizing the need for transparent 
+reporting and accessible training protocols. Future developments should focus on integrating 
+physics-based scoring functions with structure prediction models and incorporating dynamic 
+conformational information to enhance reliability for drug discovery applications.
 
 
 \section{Author Contributions}

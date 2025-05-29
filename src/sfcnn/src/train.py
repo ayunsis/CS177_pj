@@ -73,11 +73,11 @@ if __name__ == '__main__':
         return train_idx, val_idx
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', '-b', default=32, type=int)  # Increased batch size
+    parser.add_argument('--batch', '-b', default=32, type=int) 
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.00068, type=float)  # Increased learning rate
-    parser.add_argument('--k_folds', '-k', default=7, type=int, help='Number of folds for cross validation')
-    parser.add_argument('--grad_clip', default=1.0, type=float, help='Gradient clipping value')
+    parser.add_argument('--lr', default=0.00068, type=float)  
+    parser.add_argument('--k_folds', '-k', default=10, type=int, help='Number of folds for cross validation')
+    parser.add_argument('--grad_clip', default=0.15, type=float, help='Gradient clipping value')
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     best_overall_pearson = -1.0
     best_fold = -1
 
-    TRAIN_EPOCHS = 150
+    TRAIN_EPOCHS = 100
     SAVE_EPOCHS = 0
 
     # --- Mixed Precision Setup ---
@@ -210,22 +210,14 @@ if __name__ == '__main__':
         model = CNN3D(dropout=args.dropout).to(device)
         
         # Get parameters for manual optimization
-        conv_params = []
-        fc_params = []
-        for name, param in model.named_parameters():
-            if 'fc.5' in name:  # Last linear layer
-                fc_params.append(param)
-            else:
-                conv_params.append(param)
+        last_linear = model.fc[-1]
+        params = [
+            {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
+            {'params': last_linear.parameters(), 'weight_decay': 0.01} 
+        ]
         
         criterion = nn.MSELoss()
-        
-        # Create optimizers
-        conv_optimizer = optim.Adam(conv_params, lr=args.lr)
-        fc_optimizer = optim.Adam(fc_params, lr=args.lr, weight_decay=0.01)
-        
-        # Remove GradScaler for simpler manual optimization
-        # scaler = GradScaler()
+        optimizer = optim.RMSprop(params, lr=args.lr)
 
         train_loss_history = []
         train_metrics_history = []
@@ -245,8 +237,7 @@ if __name__ == '__main__':
                 xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
                 
                 # Zero gradients using optimizers
-                conv_optimizer.zero_grad()
-                fc_optimizer.zero_grad()
+                optimizer.zero_grad()
                 
                 # Use autocast for forward pass only
                 with autocast():
@@ -257,11 +248,10 @@ if __name__ == '__main__':
                 loss.backward()
                 
                 # Gradient clipping
-                torch.nn.utils.clip_grad_norm_(conv_params + fc_params, args.grad_clip)
+                # torch.nn.utils.clip_grad_norm_([p for group in params for p in group['params'] if p.grad is not None], args.grad_clip)
                 
-                # Optimizer step
-                conv_optimizer.step()
-                fc_optimizer.step()
+                # Optimizer steps
+                optimizer.step()
                 
                 train_loss += loss.item() * xb.size(0)
                 

@@ -19,7 +19,7 @@ def load_cv_results():
             print("Cross-validation summary not found. Make sure to run training with cross-validation first.")
             return None
 
-def plot_fold_metrics(fold_num, k_folds=5):
+def plot_fold_metrics(fold_num, k_folds=10):
     """Plot metrics for a specific fold"""
     # Try new structure first
     fold_dir = f'src/sfcnn/src/train_results/cv_results/fold_{fold_num}/metrics'
@@ -71,7 +71,7 @@ def plot_fold_metrics(fold_num, k_folds=5):
     plt.tight_layout()
     plt.show()
 
-def plot_cv_summary(k_folds=5):
+def plot_cv_summary(k_folds=10):
     """Plot cross-validation summary across all folds"""
     cv_summary = load_cv_results()
     if cv_summary is None:
@@ -123,7 +123,7 @@ def plot_cv_summary(k_folds=5):
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
 
     sns.set_style("whitegrid")
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     fig.suptitle(f'{k_folds}-Fold Cross-Validation Results Summary', fontsize=16, y=0.98)
 
     # Plot average metrics with error bars
@@ -152,31 +152,6 @@ def plot_cv_summary(k_folds=5):
         if name == 'Pearson':
             ax.set_ylim(0, 1)
 
-    # Plot cross-validation summary statistics
-    ax = axes[1, 2]
-    fold_results = cv_summary['fold_results']
-    folds = [result['fold'] for result in fold_results]
-    test_pearsons = [result['best_test_pearson'] for result in fold_results]
-    
-    bars = ax.bar(folds, test_pearsons, color='skyblue', alpha=0.7, edgecolor='navy')
-    ax.axhline(y=cv_summary['mean_test_pearson'], color='red', linestyle='--', 
-               label=f"Mean: {cv_summary['mean_test_pearson']:.4f}")
-    ax.axhline(y=cv_summary['best_overall_pearson'], color='green', linestyle='--', 
-               label=f"Best: {cv_summary['best_overall_pearson']:.4f}")
-    
-    # Highlight best fold
-    best_fold_idx = cv_summary['best_fold'] - 1
-    bars[best_fold_idx].set_color('lightgreen')
-    bars[best_fold_idx].set_edgecolor('darkgreen')
-    bars[best_fold_idx].set_linewidth(2)
-    
-    ax.set_title('Best Test Pearson by Fold')
-    ax.set_xlabel('Fold')
-    ax.set_ylabel('Best Test Pearson')
-    ax.legend()
-    ax.grid(alpha=0.7)
-    ax.set_ylim(0, 1)
-
     plt.tight_layout()
     plt.show()
 
@@ -190,6 +165,12 @@ def plot_cv_summary(k_folds=5):
     print(f"\nIndividual Fold Results:")
     for i, result in enumerate(cv_summary['fold_results'], 1):
         print(f"  Fold {i}: Best Test Pearson = {result['best_test_pearson']:.4f}")
+
+    # Plot the metrics for the best fold
+    if 'best_fold' in cv_summary:
+        best_fold_num = cv_summary['best_fold']
+        print(f"\nPlotting metrics for the best fold: Fold {best_fold_num}")
+        plot_fold_metrics(best_fold_num, k_folds)
 
 def list_available_folds():
     """List available folds in the results directory"""
@@ -220,7 +201,7 @@ if __name__ == "__main__":
     parser.add_argument('--mode', choices=['fold', 'summary', 'legacy', 'list'], default='summary',
                        help='Visualization mode: fold (specific fold), summary (CV summary), legacy (old format), list (show available folds)')
     parser.add_argument('--fold', type=int, default=1, help='Fold number to visualize (for fold mode)')
-    parser.add_argument('--k_folds', type=int, default=5, help='Number of folds used in cross-validation')
+    parser.add_argument('--k_folds', type=int, default=10, help='Number of folds used in cross-validation')
     args = parser.parse_args()
 
     if args.mode == 'list':
