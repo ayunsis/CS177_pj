@@ -19,19 +19,28 @@ class HDF5GridDataset(Dataset):
         self.label_key = label_key
         self.indices = indices
         self.normalize_y = normalize_y
+        self.length = None
+        self.h5_file = None
+        self.label_file = None
         with h5py.File(self.h5_path, 'r') as f:
             self.length = len(f[self.data_key]) if indices is None else len(indices)
+
     def __len__(self):
         return self.length
-    def __getitem__(self, idx):
-        real_idx = self.indices[idx] if self.indices is not None else idx
-        with h5py.File(self.h5_path, 'r') as f:
-            grid = torch.tensor(f[self.data_key][real_idx], dtype=torch.float32)
 
+    def _ensure_open(self):
+        if self.h5_file is None:
+            self.h5_file = h5py.File(self.h5_path, 'r')
+        if self.label_path and self.label_file is None:
+            self.label_file = h5py.File(self.label_path, 'r')
+
+    def __getitem__(self, idx):
+        self._ensure_open()
+        real_idx = self.indices[idx] if self.indices is not None else idx
+        grid = torch.tensor(self.h5_file[self.data_key][real_idx], dtype=torch.float32)
         if self.label_path is not None and self.label_key is not None:
-            with h5py.File(self.label_path, 'r') as f:
-                label = torch.tensor(f[self.label_key][real_idx], dtype=torch.float32).unsqueeze(0)
-                label = label / self.normalize_y
+            label = torch.tensor(self.label_file[self.label_key][real_idx], dtype=torch.float32).unsqueeze(0)
+            label = label / self.normalize_y
             return grid, label
         else:
             return grid
@@ -64,7 +73,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int)
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
-    parser.add_argument('--lr', default=0.002, type=float)
+    parser.add_argument('--lr', default=0.000675, type=float)
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
@@ -88,15 +97,15 @@ if __name__ == '__main__':
                               batch_size=args.batch, 
                               shuffle=True, 
                               pin_memory=True, 
-                              num_workers=8)
+                              num_workers=2)
     val_loader = DataLoader(val_dataset, 
                             batch_size=args.batch, 
                             pin_memory=True, 
-                            num_workers=8)
+                            num_workers=2)
     test_loader = DataLoader(test_dataset, 
                              batch_size=args.batch, 
                              pin_memory=True, 
-                             num_workers=8)
+                             num_workers=2)
     print('Dataset load finished')
 
     class CNN3D(nn.Module):
@@ -162,8 +171,13 @@ if __name__ == '__main__':
     test_metrics_history = []
     best_pearson = -1.0
 
-    TRAIN_EPOCHS = 200
+    TRAIN_EPOCHS = 400
     SAVE_EPOCHS = 0
+
+    # --- Mixed Precision Setup ---
+    from torch.cuda.amp import autocast, GradScaler
+    scaler = GradScaler()
+    # ----------------------------
 
     for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc="Epochs"):
         model.train()
@@ -173,10 +187,12 @@ if __name__ == '__main__':
         for xb, yb in tqdm(train_loader, desc=f"Train {epoch:03d}", leave=False):
             xb, yb = xb.to(device), yb.to(device)  
             optimizer.zero_grad()
-            pred = model(xb)
-            loss = criterion(pred, yb)
-            loss.backward()
-            optimizer.step()
+            with autocast():
+                pred = model(xb)
+                loss = criterion(pred, yb)
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
             train_loss += loss.item() * xb.size(0)
             train_preds.append(pred.detach().cpu().numpy())
             train_targets.append(yb.detach().cpu().numpy())
@@ -203,7 +219,8 @@ if __name__ == '__main__':
             with torch.no_grad():
                 for xb, yb in tqdm(val_loader, desc=f"Validation Metrics {epoch:03d}", leave=False):
                     xb, yb = xb.to(device), yb.to(device)
-                    pred = model(xb)
+                    with autocast():
+                        pred = model(xb)
                     preds.append(pred.cpu().numpy())
                     targets.append(yb.cpu().numpy())
             preds = np.concatenate(preds).flatten()
@@ -229,7 +246,8 @@ if __name__ == '__main__':
             with torch.no_grad():
                 for xb, yb in tqdm(test_loader, desc=f"CASF2016 Pearson {epoch:03d}", leave=False):
                     xb, yb = xb.to(device), yb.to(device)
-                    pred = model(xb)
+                    with autocast():
+                        pred = model(xb)
                     preds.append(pred.cpu().numpy())
                     targets.append(yb.cpu().numpy())
             preds = np.concatenate(preds).flatten() 
@@ -252,4 +270,3 @@ if __name__ == '__main__':
         np.save('src/sfcnn/src/train_results/train_metrics_history.npy', np.array(train_metrics_history))
         np.save('src/sfcnn/src/train_results/val_metrics_history.npy', np.array(val_metrics_history))
         np.save('src/sfcnn/src/train_results/test_metrics_history.npy', np.array(test_metrics_history))
-
