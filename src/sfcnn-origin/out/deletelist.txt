@@ -1,6 +1,0 @@
-target1: 83 2xb8
-         94 2ymd
-target2: 66 3n76
-         67 3n7a
-         68 3n86
-target3: 24 4ciw

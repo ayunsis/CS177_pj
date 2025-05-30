@@ -42,7 +42,6 @@ class HDF5GridDataset(Dataset):
         grid = torch.tensor(self.h5_file[self.data_key][real_idx], dtype=torch.float32)
         if self.label_path is not None and self.label_key is not None:
             label = torch.tensor(self.label_file[self.label_key][real_idx], dtype=torch.float32).unsqueeze(0)
-            # Normalize label by dividing by 15.0
             label = label / self.normalize_y
             return grid, label
         else:
@@ -54,7 +53,6 @@ if __name__ == '__main__':
     CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
     CORE_LABEL = r'data/test_hdf5/core_label.h5'
     
-    # Print dataset shapes for verification
     with h5py.File('data/train_hdf5/train_grids.h5', 'r') as f:
         print("train_grids:", f['train_grids'].shape)
     
@@ -67,7 +65,6 @@ if __name__ == '__main__':
     with h5py.File('data/test_hdf5/core_label.h5', 'r') as f:
         print("core_label:", f['core_label'].shape)
 
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', '-b', default=32, type=int) 
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
@@ -78,7 +75,6 @@ if __name__ == '__main__':
     with h5py.File(TRAIN_GRIDS, 'r') as f:
         total = len(f['train_grids'])
     
-    # Use all training data for cross validation
     all_train_idx = np.arange(total)
     
     with h5py.File(CORE_GRIDS, 'r') as f:
@@ -91,7 +87,7 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_dataset, 
                              batch_size=args.batch, 
                              pin_memory=True, 
-                             num_workers=2)  # Increased workers
+                             num_workers=2)
 
     print('Dataset load finished')
 
@@ -99,7 +95,7 @@ if __name__ == '__main__':
         def __init__(self, dropout=0.5):
             super().__init__()
             self.net = nn.Sequential(
-                nn.Conv3d(28, 7, kernel_size=1),  # input: (B,28,20,20,20)
+                nn.Conv3d(28, 7, kernel_size=1),
                 nn.BatchNorm3d(7),
                 nn.ReLU(),
                 nn.Conv3d(7, 7, kernel_size=3),
@@ -133,8 +129,8 @@ if __name__ == '__main__':
                 nn.Linear(256, 1)
             )
         
-        def forward(self, x):       # (batch*seq, 20, 20, 20, 28)
-            x = x.permute(0, 4, 1, 2, 3)  # (B, 20, 20, 20, 28) -> (B, 28, 20, 20, 20)
+        def forward(self, x):
+            x = x.permute(0, 4, 1, 2, 3)
             x = self.net(x)
             x = self.fc(x)
             return x
@@ -145,21 +141,18 @@ if __name__ == '__main__':
     if os.path.exists('src/sfcnn/src/train_results/cnnmodel'):
         shutil.rmtree('src/sfcnn/src/train_results/cnnmodel')
     os.makedirs('src/sfcnn/src/train_results/cnnmodel', exist_ok=True)
-    # Create overall results directory
     if os.path.exists('src/sfcnn/src/train_results/cv_results'):
         shutil.rmtree('src/sfcnn/src/train_results/cv_results')
     os.makedirs('src/sfcnn/src/train_results/cv_results', exist_ok=True)
 
-    # Use normal K-Fold cross validation
     print("Using normal K-Fold cross validation...")
     
     kfold = KFold(n_splits=args.k_folds, shuffle=True, random_state=1234)
     fold_results = []
-    best_overall_pearson = -1.0
+    best_overall_loss = float('inf')
     best_fold = -1
-
-    TRAIN_EPOCHS = 150
-    SAVE_EPOCHS = 0    # --- Mixed Precision Setup ---
+    TRAIN_EPOCHS = 2
+    SAVE_EPOCHS = 0
     from torch.cuda.amp import autocast, GradScaler
     for fold, (train_ids, val_ids) in enumerate(kfold.split(all_train_idx)):        
         print(f'\nFOLD {fold + 1}/{args.k_folds}')
@@ -168,7 +161,6 @@ if __name__ == '__main__':
         print(f"Train set: {len(train_ids)} samples")
         print(f"Val set: {len(val_ids)} samples")
         
-        # Create fold-specific directories
         fold_dir = f'src/sfcnn/src/train_results/cv_results/fold_{fold+1}'
         fold_model_dir = f'{fold_dir}/models'
         fold_metrics_dir = f'{fold_dir}/metrics'
@@ -176,13 +168,10 @@ if __name__ == '__main__':
         os.makedirs(fold_model_dir, exist_ok=True)
         os.makedirs(fold_metrics_dir, exist_ok=True)
         
-        # Create datasets for this fold
         train_fold_idx = all_train_idx[train_ids]
         val_fold_idx = all_train_idx[val_ids]
-          # Save fold indices for reproducibility
         np.save(f'{fold_dir}/train_indices.npy', train_fold_idx)
         np.save(f'{fold_dir}/val_indices.npy', val_fold_idx)
-        
         
         train_dataset = HDF5GridDataset(
             TRAIN_GRIDS, 'train_grids', TRAIN_LABEL, 'train_label', train_fold_idx
@@ -195,18 +184,16 @@ if __name__ == '__main__':
                                   batch_size=args.batch, 
                                   shuffle=True, 
                                   pin_memory=True, 
-                                  num_workers=2,  # Increased workers
-                                  persistent_workers=True)  # Keep workers alive
+                                  num_workers=2,
+                                  persistent_workers=True)
         val_loader = DataLoader(val_dataset, 
                                 batch_size=args.batch, 
                                 pin_memory=True, 
-                                num_workers=2,  # Increased workers
+                                num_workers=2,
                                 persistent_workers=True)
         
-        # Initialize model for this fold
         model = CNN3D(dropout=args.dropout).to(device)
         
-        # Get parameters for manual optimization
         last_linear = model.fc[-1]
         params = [
             {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0},
@@ -216,14 +203,13 @@ if __name__ == '__main__':
         criterion = nn.MSELoss()
         optimizer = optim.RMSprop(params, lr=args.lr)
         
-        # Initialize GradScaler for this fold
         scaler = GradScaler()
 
         train_loss_history = []
         train_metrics_history = []
         val_metrics_history = []
         test_metrics_history = []
-        best_fold_pearson = -1.0
+        best_fold_loss = float('inf')
 
         for epoch in tqdm(range(1, TRAIN_EPOCHS+1), desc=f"Fold {fold+1} Progress", unit="epoch"):
             model.train()
@@ -231,20 +217,16 @@ if __name__ == '__main__':
             train_preds = []
             train_targets = []
             
-            # Training loop with progress bar
             train_pbar = tqdm(train_loader, desc=f"F{fold+1}E{epoch:03d} Train", leave=False, unit="batch")
             for xb, yb in train_pbar:
                 xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
                 
-                # Zero gradients using optimizers
                 optimizer.zero_grad()
                 
-                # Use autocast for forward pass
                 with autocast():
                     pred = model(xb)
                     loss = criterion(pred, yb)
                 
-                # Scale loss and backward pass
                 scaler.scale(loss).backward()
                 
                 scaler.step(optimizer)
@@ -254,14 +236,12 @@ if __name__ == '__main__':
                 train_preds.append(pred.detach().cpu().numpy())
                 train_targets.append(yb.detach().cpu().numpy())
                 
-                # Update progress bar with current loss
                 train_pbar.set_postfix(loss=f"{loss.item():.4f}")
             
             train_pbar.close()
             train_loss /= len(train_loader.dataset)
             train_loss_history.append(train_loss)
 
-            # Calculate training metrics less frequently for speed
             if len(train_preds) > 0:
                 train_preds = np.concatenate(train_preds).flatten()
                 train_targets = np.concatenate(train_targets).flatten()
@@ -282,19 +262,21 @@ if __name__ == '__main__':
                 model.eval()
                 preds = []
                 targets = []
+                val_loss = 0
                 
-                # Validation loop with progress bar
                 val_pbar = tqdm(val_loader, desc=f"F{fold+1}E{epoch:03d} Val", leave=False, unit="batch")
                 with torch.no_grad():
                     for xb, yb in val_pbar:
                         xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
-                        # Use autocast for inference speed
                         with autocast():
                             pred = model(xb)
+                            loss = criterion(pred, yb)
+                        val_loss += loss.item() * xb.size(0)
                         preds.append(pred.cpu().numpy())
                         targets.append(yb.cpu().numpy())
                 val_pbar.close()
                 
+                val_loss /= len(val_loader.dataset)
                 preds = np.concatenate(preds).flatten()
                 targets = np.concatenate(targets).flatten()
                 pearson = np.corrcoef(preds, targets)[0, 1]
@@ -310,23 +292,25 @@ if __name__ == '__main__':
 
                 val_metrics_history.append([epoch, pearson, rmse, mae, sd])
 
-                # Test evaluation with progress bar
-                model.eval()
+                # Test evaluation in training loop
                 test_preds = []
                 test_targets = []
+                test_loss = 0
                 
                 test_pbar = tqdm(test_loader, desc=f"F{fold+1}E{epoch:03d} Test", leave=False, unit="batch")
                 with torch.no_grad():
                     for xb, yb in test_pbar:
                         xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
-                        # Use autocast for inference speed
                         with autocast():
                             pred = model(xb)
+                            loss = criterion(pred, yb)
+                        test_loss += loss.item() * xb.size(0)
                         test_preds.append(pred.cpu().numpy())
                         test_targets.append(yb.cpu().numpy())
                 test_pbar.close()
                 
-                test_preds = np.concatenate(test_preds).flatten() 
+                test_loss /= len(test_loader.dataset)
+                test_preds = np.concatenate(test_preds).flatten()
                 test_targets = np.concatenate(test_targets).flatten()
                 test_pearson = np.corrcoef(test_preds, test_targets)[0, 1]
                 test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
@@ -337,19 +321,20 @@ if __name__ == '__main__':
                 test_regr.fit(test_x, test_y)
                 test_y_ = test_regr.predict(test_x)
                 test_sd = np.sqrt(np.sum((test_y - test_y_) ** 2) / (len(test_y) - 1.0))
-                test_metrics_history.append([epoch, test_pearson, test_rmse, test_mae, test_sd])  
 
-                # Save best model for this fold
-                if test_pearson > best_fold_pearson:
-                    best_fold_pearson = test_pearson
-                    # Save to fold-specific directory
-                    torch.save(model.state_dict(), f'{fold_model_dir}/epoch{epoch:03d}_{test_pearson:.4f}.pt')
-                    # Also save config info
+                test_metrics_history.append([epoch, test_pearson, test_rmse, test_mae, test_sd])
+
+                if val_loss < best_fold_loss:
+                    best_fold_loss = val_loss
+                    torch.save(model.state_dict(), f'{fold_model_dir}/epoch{epoch:03d}_{val_loss:.4f}.pt')
                     model_info = {
                         'epoch': epoch,
-                        'test_pearson': test_pearson,
+                        'val_loss': val_loss,
+                        'train_loss': train_loss,
+                        'test_loss': test_loss,
                         'val_pearson': pearson,
                         'train_pearson': train_pearson,
+                        'test_pearson': test_pearson,
                         'fold': fold + 1,
                         'model_config': {
                             'dropout': args.dropout,
@@ -359,35 +344,37 @@ if __name__ == '__main__':
                     }
                     np.save(f'{fold_model_dir}/best_model_info.npy', model_info)
                 
-                # Update overall best
-                if test_pearson > best_overall_pearson:
-                    best_overall_pearson = test_pearson
+                if val_loss < best_overall_loss:
+                    best_overall_loss = val_loss
                     best_fold = fold + 1
-                    # Save overall best model
                     torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/best_overall_weights.pt')
-                    # Copy to main model directory as well
                     torch.save(model.state_dict(), f'{fold_model_dir}/overall_best_weights.pt')
 
-            # Update main progress bar with current metrics
-            # tqdm.write(f"F{fold+1}E{epoch:03d} | Train: P={train_pearson:.4f} L={train_loss:.4f} | " +
-            #           (f"Val: P={pearson:.4f} | Test: P={test_pearson:.4f}" if epoch >= SAVE_EPOCHS else ""))
-
-        # Save fold results to fold-specific directory
+        # Remove the separate test evaluation block and update metrics saving
         np.save(f'{fold_metrics_dir}/train_metrics_history.npy', np.array(train_metrics_history))
         np.save(f'{fold_metrics_dir}/val_metrics_history.npy', np.array(val_metrics_history))
         np.save(f'{fold_metrics_dir}/test_metrics_history.npy', np.array(test_metrics_history))
         np.save(f'{fold_metrics_dir}/train_loss_history.npy', np.array(train_loss_history))
         
-        # Save final model state
         torch.save(model.state_dict(), f'{fold_model_dir}/final_weights_epoch{TRAIN_EPOCHS}.pt')
         
-        # Save fold summary
+        # Update fold summary with final test metrics
+        final_test_metrics = test_metrics_history[-1] if test_metrics_history else [0, 0, 0, 0, 0]
         fold_summary = {
             'fold': fold + 1,
-            'best_test_pearson': best_fold_pearson,
+            'best_val_loss': best_fold_loss,
+            'final_val_loss': val_metrics_history[-1][2] if val_metrics_history else 0,  # RMSE as loss proxy
+            'final_test_loss': final_test_metrics[2],  # RMSE as loss proxy
+            'final_train_loss': train_loss,
+            'final_test_pearson': final_test_metrics[1],
             'final_val_pearson': val_metrics_history[-1][1] if val_metrics_history else 0,
-            'final_test_pearson': test_metrics_history[-1][1] if test_metrics_history else 0,
             'final_train_pearson': train_metrics_history[-1][1] if train_metrics_history else 0,
+            'test_metrics': {
+                'test_pearson': final_test_metrics[1],
+                'test_rmse': final_test_metrics[2],
+                'test_mae': final_test_metrics[3],
+                'test_sd': final_test_metrics[4]
+            },
             'total_epochs': TRAIN_EPOCHS,
             'train_samples': len(train_fold_idx),
             'val_samples': len(val_fold_idx),
@@ -402,22 +389,24 @@ if __name__ == '__main__':
         
         fold_results.append(fold_summary)
         
-        print(f'Fold {fold + 1} completed. Best test Pearson: {best_fold_pearson:.4f}')
+        print(f'Fold {fold + 1} completed. Best val loss: {best_fold_loss:.4f}, Test loss: {test_loss:.4f}')
         print(f'Results saved to: {fold_dir}')
 
-    # Print cross-validation summary
     print(f'\nCross-Validation Results Summary:')
     print('-' * 50)
-    test_pearsons = [result['best_test_pearson'] for result in fold_results]
-    print(f'Mean Test Pearson: {np.mean(test_pearsons):.4f} ± {np.std(test_pearsons):.4f}')
-    print(f'Best Overall Pearson: {best_overall_pearson:.4f} (Fold {best_fold})')
+    val_losses = [result['best_val_loss'] for result in fold_results]
+    test_losses = [result['final_test_loss'] for result in fold_results]
+    print(f'Mean Val Loss: {np.mean(val_losses):.4f} ± {np.std(val_losses):.4f}')
+    print(f'Mean Test Loss: {np.mean(test_losses):.4f} ± {np.std(test_losses):.4f}')
+    print(f'Best Overall Val Loss: {best_overall_loss:.4f} (Fold {best_fold})')
     
-    # Save comprehensive cross-validation summary
     cv_summary = {
         'fold_results': fold_results,
-        'mean_test_pearson': np.mean(test_pearsons),
-        'std_test_pearson': np.std(test_pearsons),
-        'best_overall_pearson': best_overall_pearson,
+        'mean_val_loss': np.mean(val_losses),
+        'std_val_loss': np.std(val_losses),
+        'mean_test_loss': np.mean(test_losses),
+        'std_test_loss': np.std(test_losses),
+        'best_overall_val_loss': best_overall_loss,
         'best_fold': best_fold,
         'total_train_samples': len(all_train_idx),
         'total_test_samples': len(test_idx),        
@@ -436,7 +425,6 @@ if __name__ == '__main__':
     }
     np.save('src/sfcnn/src/train_results/cv_results/cv_summary.npy', cv_summary)
     
-    # Also save a backup in the main results directory
     np.save('src/sfcnn/src/train_results/cv_summary.npy', cv_summary)
     
     print(f'\nAll results saved to: src/sfcnn/src/train_results/cv_results/')
