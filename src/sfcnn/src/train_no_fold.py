@@ -50,6 +50,7 @@ if __name__ == '__main__':
     TRAIN_LABEL = r'data/train_hdf5/train_label.h5'
     CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
     CORE_LABEL = r'data/test_hdf5/core_label.h5'
+    
     with h5py.File('data/train_hdf5/train_grids.h5', 'r') as f:
         print("train_grids:", f['train_grids'].shape)
     

@@ -4,7 +4,6 @@ import os
 
 os.environ["OPENBABEL_WARNINGS"] = "0"
 
-print("Importing libraries...")
 from glob import glob
 import numpy as np
 import random
@@ -34,7 +33,6 @@ class Feature_extractor():
                     self.atom_codes[k] = i
             else:
                 self.atom_codes[j] = i         
-        print(self.atom_codes)     
         self.sum_atom_types = len(atom_types)
 
     def encode(self, atomic_num, molprotein):
@@ -48,7 +46,6 @@ class Feature_extractor():
             encoding[self.sum_atom_types+self.atom_codes[key]] = 1.0
         
         return encoding
-    
     
     def get_features(self, molecule, molprotein):
         coords = []
@@ -77,7 +74,7 @@ class Feature_extractor():
         assert coords.shape[0] == features.shape[0]  
         grids = []
         x=y=z=np.array(range(-10,10),dtype=np.float32)+0.5
-        # original
+        
         grid=np.zeros((20,20,20,features.shape[1]),dtype=np.float32)
         for i in range(len(coords)):
             coord=coords[i]
@@ -87,7 +84,7 @@ class Feature_extractor():
             if np.max(tmpx)<=19.5 and np.max(tmpy)<=19.5 and np.max(tmpz) <=19.5:
                 grid[np.argmin(tmpx),np.argmin(tmpy),np.argmin(tmpz)] += features[i]
         grids.append(grid)
-        # rotations
+        
         coords_rot = coords.copy()
         for j in range(rotations):
             theta = random.uniform(np.pi/18,np.pi/2)
@@ -102,12 +99,11 @@ class Feature_extractor():
                 if np.max(tmpx)<=19.5 and np.max(tmpy)<=19.5 and np.max(tmpz) <=19.5:
                     grid_rot[np.argmin(tmpx),np.argmin(tmpy),np.argmin(tmpz)] += features[i]
             grids.append(grid_rot)
-        return np.stack(grids, axis=0)  # shape: (rotations+1, 20, 20, 20, features)
+        return np.stack(grids, axis=0)
 
 Feature = Feature_extractor()
 
 CORE_PATH = r'data/chai_results_cif'
-print("Preparing core directory...")
 core_dirs = glob(os.path.join(CORE_PATH, '*'))
 core_dirs.sort()
 
@@ -137,14 +133,12 @@ CORE_2016_LABELS = r'data/chai_hdf5/core_2016_label.h5'
 CORE_sfcnn_LABELS = r'data/chai_hdf5/core_sfcnn_label.h5'
 TEST_GRIDS  = r'data/chai_hdf5/core_grids.h5'
 
-print("Saving core label data...")
 os.makedirs(os.path.dirname(CORE_LABELS), exist_ok=True)
 with h5py.File(CORE_2016_LABELS, 'w') as f:
     f.create_dataset('core_label', data=core2016_labels)
 with h5py.File(CORE_sfcnn_LABELS, 'w') as f:
     f.create_dataset('core_label', data=sfcnn_labels)
 
-print("Processing core complexes...")
 core_complexes = []
 parser = MMCIFParser(QUIET=True)
 
@@ -191,16 +185,13 @@ with h5py.File(TEST_GRIDS, 'w') as h5f:
         np.concatenate([feats_p, feats_l], axis=0),
         rotations=0
     )
-    grid_shape = sample_grid.shape[1:]  # (20,20,20,features)
+    grid_shape = sample_grid.shape[1:]
     dset = h5f.create_dataset('core_grids', shape=(num_core,) + grid_shape, dtype=np.float32)
 
     for idx, (pdb_mol, lig_mol) in enumerate(core_complexes):
-        print(f"Processing core complex {idx+1}/{num_core}...")
         coords1, feats1 = Feature.get_features(pdb_mol, 1)
         coords2, feats2 = Feature.get_features(lig_mol, 0)
         center = (np.max(coords2, axis=0) + np.min(coords2, axis=0)) / 2
         coords  = np.concatenate([coords1, coords2], axis=0) - center
         feats   = np.concatenate([feats1, feats2], axis=0)
-        dset[idx] = Feature.grid(coords, feats, rotations=0)[0]  # just the unrotated grid
-
-print("Core processing complete.")
+        dset[idx] = Feature.grid(coords, feats, rotations=0)[0]

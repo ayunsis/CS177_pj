@@ -63,7 +63,6 @@ def get_grid(protein, ligand):
     grid=Feature.grid(coords,features)
     return grid
 
-# --- PyTorch Model definition (same as in train.py) ---
 class CNN3D(nn.Module):
     def __init__(self, dropout=0.5):
         super().__init__()

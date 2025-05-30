@@ -24,7 +24,7 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0em}
 
-\title[Short Article Title]{Assessing the Reliability of AlphaFold3 Predictions for Protein-Ligand Affinity Prediction via Sfcnn}
+\title[Assessing AlphaFold3 on PLA]{Assessing the Reliability of AlphaFold3 Predictions for Protein-Ligand Affinity Prediction via Sfcnn}
 
 \author[1]{Guo Yu}
 \author[1]{Yiming Wu}
@@ -37,7 +37,16 @@
 \orgaddress{\street{393 Middle Huaxia Road}, \postcode{201210}, \state{Shanghai}, \country{China}}}
 
 \abstract{
-This study systematically evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. The Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, was reproduced using PyTorch. Model performance was validated on the PDBbind v2019 refined set for training and the CASF-2016 core set for testing. Subsequently, AF3-derived protein structures from the CASF-2016 core set were assessed and compared to experimentally determined structures using Sfcnn scores to determine the suitability of AF3 predictions in PLA applications.
+This study systematically evaluates the reliability of AlphaFold3 
+(AF3)-predicted protein structures for protein-ligand affinity (PLA) 
+prediction tasks. The Sfcnn model, a 3D convolutional neural network 
+(CNN) for PLA prediction, was reproduced using PyTorch,
+its performance was validated on the PDBbind v2019 refined set 
+for training and the CASF-2016 core set for testing. Subsequently, 
+AF3-derived protein structures from the CASF-2016 core set were 
+assessed and compared to experimentally determined structures 
+using Sfcnn scores to determine the suitability of AF3 predictions 
+in PLA applications.
 }
 \keywords{AlphaFold3, protein-ligand affinity, CNN scoring function, CASF-2016}
 
@@ -70,7 +79,7 @@ Protein-ligand complexes are represented as 3D grids of size $20 \times 20 \time
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/one_hot.png}
-    \caption{Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Default resolution is $20\\times20\\times20$ with 28 atom types.}
+    \caption{Featurization of protein-ligand complexes. Example shown: PDB ID 1a30. Resolution is $20 \times 20 \times20$ with 28 atom types.}
     \label{fig:onehot}
 \end{figure}
 
@@ -162,7 +171,7 @@ SD & 1.3928 & 1.3252 \\
 \end{tabular}
 \end{table}
 
-The 7-fold cross-validation yielded a mean test Pearson correlation of $0.7375 \\pm 0.0145$ and
+The 7-fold cross-validation yielded a mean test Pearson correlation of $0.7375 \pm 0.0145$ and
 the highest Pearson correlation of $0.7678$ on the CASF-2016 core set, as shown in Table~\ref{tab:metrics},
 demonstrating consistent model performance across different data partitions and confirming the reliability of our reproduced implementation.
 
@@ -188,13 +197,13 @@ Due to the lack of access to the original training data and the absence of autho
 The training and validation curves for the four metrics are presented in Figure~\ref{fig:ReproducedtrainPlot} and Figure~\ref{fig:OriginaltrainPlot}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/7fold_result.png}
+    \includegraphics[width=0.5\textwidth]{images/7fold_result.png}
     \caption{Training curve for reproduced hyperparameters.}
     \label{fig:ReproducedtrainPlot}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/origin_param.png}
+    \includegraphics[width=0.5\textwidth]{images/origin_param.png}
     \caption{Training curve for original hyperparameters.}
     \label{fig:OriginaltrainPlot}
 \end{figure}
@@ -305,26 +314,29 @@ a series of visual analyses are presented below:
     \label{fig:af3_heatmap_hist}
 \end{figure}
 
-Figure~\ref{fig:af3_heatmap_hist} illustrates the distribution and magnitude of prediction errors. The heatmap highlights complexes with the largest discrepancies between Sfcnn scores from AF3-predicted structures and ground truth PLA scores, while the histogram reveals a right-skewed error profile, indicating that a substantial fraction of complexes exhibit large deviations.
+Figure~\ref{fig:af3_heatmap_hist} details the distribution and magnitude of prediction errors. 
+The heatmap identifies complexes exhibiting the most significant discrepancies when comparing Sfcnn scores from AF3-predicted structures against ground truth PLA values and against scores from experimentally-derived coreset structures. 
+These discrepancies highlight instances where AF3-based predictions deviate substantially within the Sfcnn PLA framework, with pronounced differences predominantly falling within the 2.5-4.2 range.
+The histogram of residuals from AF3 Sfcnn predictions, when compared against both ground truth and coreset Sfcnn scores, displays a right-skewed distribution. 
+This skewness signifies that a considerable number of complexes are associated with large prediction errors.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/gap_violinplot.png}
+    \includegraphics[width=0.4\textwidth]{images/gap_violinplot.png}
     \caption{Violin plot of prediction gaps for AF3 structures.}
     \label{fig:af3_gap_violin}
 \end{figure}
 
-Figure~\ref{fig:af3_gap_violin} provides a complementary perspective: 
-the violin plot visualizes the full error distribution, 
-emphasizing the significantly higher presence of large gaps.
+Figure~\ref{fig:af3_gap_violin} offers a complementary view through a violin plot, which depicts the complete error distribution of AF3 Sfcnn predictions relative to both ground truth and coreset Sfcnn scores. 
+This visualization highlights that the majority of absolute prediction gaps are concentrated within the 0-2 range, while also corroborating the existence of larger deviations previously identified.
 
 \subsection{Interpretation and Implications}
-Collectively, these results demonstrate that while the reproduced Sfcnn model 
-maintains moderate agreement with experimental affinities on the CASF-2016 core set, 
-its predictive performance deteriorates when applied to AF3-predicted structures. 
-The observed changes in performance metrics, particularly the reduced Pearson correlation against ground truth, 
-indicate that current AF3 structural models introduce additional uncertainty into affinity 
-prediction pipelines. % USER: This sentence depends on the resolution of the RMSE/MAE inconsistency.
+Collectively, these findings indicate that although the reproduced Sfcnn model 
+achieves moderate concordance with experimental affinities on the CASF-2016 core set, 
+its predictive efficacy diminishes when utilizing AF3-predicted structures. 
+The observed alterations in performance metrics, notably the diminished Pearson correlation against ground truth, 
+suggest that contemporary AF3 structural models introduce a greater degree of uncertainty into affinity 
+prediction workflows.
 
 The top 10 error complexes and their corresponding protein structures and Chai-1 overall confidence scores
 are presented in Table~\ref{tab:top10_error}.
@@ -359,7 +371,8 @@ in handling specific types of complex structures. However, the
 overall high aggregate scores raise concerns about the reliability of
 AF3's confidence scores in the context of PLA prediction. 
 
-\subsection{Hypotheses for AF3's Reduced Performance}
+\section{Discussion}
+\subsection{Hypotheses for AF3's Underperformed Results}
 The observed decrease in PLA prediction accuracy for AF3-generated structures 
 can be attributed to several methodological limitations and training dataset constraints.
 
@@ -372,7 +385,7 @@ and experimental binding affinities. While AF3 excels at predicting
 static protein-ligand interactions with minimal conformational changes 
 and outperforms traditional docking in side-chain orientation accuracy, it 
 struggles with complexes involving significant conformational changes 
-(5Å RMSD). This positions AF3 as a "true-hit binary interaction modeler" 
+($>$ 5Å RMSD). This positions AF3 as a "true-hit binary interaction modeler" 
 suitable for generating structural models of experimentally validated binding pairs, 
 rather than for de novo affinity prediction. The model's limited ability 
 to differentiate across the kinome highlights the need for integration 
@@ -427,7 +440,7 @@ conformational information to enhance reliability for drug discovery application
 \begin{itemize}
     \item Designed and implemented the data pipeline, including dataset curation, preprocessing, featurization, data augmentation, and storage.
     \item Managed exclusion of overlapping complexes and ensured data compatibility with the reproduced network.
-    \item Designed and maintained the entire AF3 generation-evaluation workflow, implemented K-fold cross-validation.
+    \item Designed and maintained the AF3 generation-evaluation workflow, implemented K-fold cross-validation.
 \end{itemize}
 
 \subsection{Yiming Wu}

@@ -77,20 +77,18 @@ def plot_cv_summary(k_folds=7):
     if cv_summary is None:
         return
 
-    # Collect metrics from all folds
     all_train_metrics = []
     all_val_metrics = []
     all_test_metrics = []
     
     for fold in range(1, k_folds + 1):
-        # Try new structure first
+        # Try new structure first, fallback to old structure
         fold_metrics_dir = f'src/sfcnn/src/train_results/cv_results/fold_{fold}/metrics'
         try:
             train_metrics = np.load(f'{fold_metrics_dir}/train_metrics_history.npy')
             val_metrics = np.load(f'{fold_metrics_dir}/val_metrics_history.npy')
             test_metrics = np.load(f'{fold_metrics_dir}/test_metrics_history.npy')
         except FileNotFoundError:
-            # Fallback to old structure
             try:
                 train_metrics = np.load(f'src/sfcnn/src/train_results/fold{fold}_train_metrics_history.npy')
                 val_metrics = np.load(f'src/sfcnn/src/train_results/fold{fold}_val_metrics_history.npy')
@@ -107,10 +105,9 @@ def plot_cv_summary(k_folds=7):
         print("No fold metrics found.")
         return
 
-    # Find common epoch range
+    # Find common epoch range and average metrics across folds
     min_epochs = min(len(metrics) for metrics in all_test_metrics)
     
-    # Average metrics across folds
     train_mean = np.mean([metrics[:min_epochs] for metrics in all_train_metrics], axis=0)
     train_std = np.std([metrics[:min_epochs] for metrics in all_train_metrics], axis=0)
     val_mean = np.mean([metrics[:min_epochs] for metrics in all_val_metrics], axis=0)
@@ -126,7 +123,6 @@ def plot_cv_summary(k_folds=7):
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     fig.suptitle(f'{k_folds}-Fold Cross-Validation Results Summary', fontsize=16, y=0.98)
 
-    # Plot average metrics with error bars
     for i, name in enumerate(metrics_names):
         row, col = i // 2, i % 2
         ax = axes[row, col]
@@ -155,18 +151,15 @@ def plot_cv_summary(k_folds=7):
     plt.tight_layout()
     plt.show()
 
-    # Print summary statistics with enhanced info
     print(f"\nCross-Validation Summary:")
     print(f"Number of folds: {k_folds}")
     print(f"Mean Test Pearson: {cv_summary['mean_test_pearson']:.4f} ± {cv_summary['std_test_pearson']:.4f}")
     print(f"Best Overall Pearson: {cv_summary['best_overall_pearson']:.4f} (Fold {cv_summary['best_fold']})")
     
-    # Print individual fold results
     print(f"\nIndividual Fold Results:")
     for i, result in enumerate(cv_summary['fold_results'], 1):
         print(f"  Fold {i}: Best Test Pearson = {result['best_test_pearson']:.4f}")
 
-    # Plot the metrics for the best fold
     if 'best_fold' in cv_summary:
         best_fold_num = cv_summary['best_fold']
         print(f"\nPlotting metrics for the best fold: Fold {best_fold_num}")

@@ -42,6 +42,7 @@ class HDF5GridDataset(Dataset):
         grid = torch.tensor(self.h5_file[self.data_key][real_idx], dtype=torch.float32)
         if self.label_path is not None and self.label_key is not None:
             label = torch.tensor(self.label_file[self.label_key][real_idx], dtype=torch.float32).unsqueeze(0)
+            # Normalize label by dividing by 15.0
             label = label / self.normalize_y
             return grid, label
         else:
@@ -52,6 +53,8 @@ if __name__ == '__main__':
     TRAIN_LABEL = r'data/train_hdf5/train_label.h5'
     CORE_GRIDS = r'data/test_hdf5/core_grids.h5'
     CORE_LABEL = r'data/test_hdf5/core_label.h5'
+    
+    # Print dataset shapes for verification
     with h5py.File('data/train_hdf5/train_grids.h5', 'r') as f:
         print("train_grids:", f['train_grids'].shape)
     
