@@ -8,7 +8,7 @@ import h5py
 import argparse
 from tqdm import tqdm
 from sklearn import linear_model
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import KFold
 import warnings
 import shutil
 warnings.filterwarnings("ignore")
@@ -66,11 +66,10 @@ if __name__ == '__main__':
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', '-b', default=128, type=int) 
+    parser.add_argument('--batch', '-b', default=32, type=int) 
     parser.add_argument('--dropout', '-d', default=0.15, type=float)
     parser.add_argument('--lr', default=0.00068, type=float)  
-    parser.add_argument('--k_folds', '-k', default=10, type=int, help='Number of folds for cross validation')
-    parser.add_argument('--grad_clip', default=0.15, type=float, help='Gradient clipping value')
+    parser.add_argument('--k_folds', '-k', default=7, type=int, help='Number of folds for cross validation')
     args = parser.parse_args()
 
     with h5py.File(TRAIN_GRIDS, 'r') as f:
@@ -130,6 +129,7 @@ if __name__ == '__main__':
                 nn.Dropout(dropout),
                 nn.Linear(256, 1)
             )
+        
         def forward(self, x):       # (batch*seq, 20, 20, 20, 28)
             x = x.permute(0, 4, 1, 2, 3)  # (B, 20, 20, 20, 28) -> (B, 28, 20, 20, 20)
             x = self.net(x)
@@ -142,45 +142,28 @@ if __name__ == '__main__':
     if os.path.exists('src/sfcnn/src/train_results/cnnmodel'):
         shutil.rmtree('src/sfcnn/src/train_results/cnnmodel')
     os.makedirs('src/sfcnn/src/train_results/cnnmodel', exist_ok=True)
-      # Create overall results directory
+    # Create overall results directory
     if os.path.exists('src/sfcnn/src/train_results/cv_results'):
         shutil.rmtree('src/sfcnn/src/train_results/cv_results')
     os.makedirs('src/sfcnn/src/train_results/cv_results', exist_ok=True)
 
-    # Load target values for stratification
-    print("Loading target values for stratified sampling...")
-    with h5py.File(TRAIN_LABEL, 'r') as f:
-        all_labels = f['train_label'][:]
+    # Use normal K-Fold cross validation
+    print("Using normal K-Fold cross validation...")
     
-    # Create bins for stratification (regression -> classification bins)
-    # Use quantile-based binning to ensure balanced bins
-    n_bins = min(args.k_folds * 3, 30)  # Reasonable number of bins
-    bin_edges = np.quantile(all_labels, np.linspace(0, 1, n_bins + 1))
-    bin_edges[-1] += 1e-8  # Ensure last value is included
-    stratify_labels = np.digitize(all_labels, bin_edges) - 1
-    
-    print(f"Target value range: [{all_labels.min():.3f}, {all_labels.max():.3f}]")
-
-    
-    skfold = StratifiedKFold(n_splits=args.k_folds, shuffle=True, random_state=1234)
+    kfold = KFold(n_splits=args.k_folds, shuffle=True, random_state=1234)
     fold_results = []
     best_overall_pearson = -1.0
     best_fold = -1
 
-    TRAIN_EPOCHS = 100
-    SAVE_EPOCHS = 0
-
-    # --- Mixed Precision Setup ---
+    TRAIN_EPOCHS = 150
+    SAVE_EPOCHS = 0    # --- Mixed Precision Setup ---
     from torch.cuda.amp import autocast, GradScaler
-    for fold, (train_ids, val_ids) in enumerate(skfold.split(all_train_idx, stratify_labels)):
+    for fold, (train_ids, val_ids) in enumerate(kfold.split(all_train_idx)):        
         print(f'\nFOLD {fold + 1}/{args.k_folds}')
         print('-' * 50)
         
-        # Print fold statistics for verification
-        train_fold_labels = all_labels[train_ids]
-        val_fold_labels = all_labels[val_ids]
-        print(f"Train set: {len(train_ids)} samples, mean={train_fold_labels.mean():.3f}, std={train_fold_labels.std():.3f}")
-        print(f"Val set: {len(val_ids)} samples, mean={val_fold_labels.mean():.3f}, std={val_fold_labels.std():.3f}")
+        print(f"Train set: {len(train_ids)} samples")
+        print(f"Val set: {len(val_ids)} samples")
         
         # Create fold-specific directories
         fold_dir = f'src/sfcnn/src/train_results/cv_results/fold_{fold+1}'
@@ -223,12 +206,12 @@ if __name__ == '__main__':
         # Get parameters for manual optimization
         last_linear = model.fc[-1]
         params = [
-            {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0.0},
+            {'params': [p for n, p in model.named_parameters() if 'fc.5' not in n], 'weight_decay': 0},
             {'params': last_linear.parameters(), 'weight_decay': 0.01} 
         ]
         
         criterion = nn.MSELoss()
-        optimizer = optim.AdamW(params, lr=args.lr)
+        optimizer = optim.RMSprop(params, lr=args.lr)
         
         # Initialize GradScaler for this fold
         scaler = GradScaler()
@@ -261,11 +244,6 @@ if __name__ == '__main__':
                 # Scale loss and backward pass
                 scaler.scale(loss).backward()
                 
-                # Gradient clipping on scaled gradients
-                # scaler.unscale_(optimizer)
-                # torch.nn.utils.clip_grad_norm_([p for group in params for p in group['params'] if p.grad is not None], args.grad_clip)
-                
-                # Optimizer step with scaler
                 scaler.step(optimizer)
                 scaler.update()
                 
@@ -439,13 +417,12 @@ if __name__ == '__main__':
         'best_overall_pearson': best_overall_pearson,
         'best_fold': best_fold,
         'total_train_samples': len(all_train_idx),
-        'total_test_samples': len(test_idx),        'cv_config': {
+        'total_test_samples': len(test_idx),        
+        'cv_config': {
             'k_folds': args.k_folds,
             'random_state': 1234,
             'shuffle': True,
-            'stratified': True,
-            'n_bins': n_bins,
-            'stratification_method': 'quantile_binning'
+            'cv_type': 'normal_kfold'
         },
         'global_hyperparameters': {
             'batch_size': args.batch,

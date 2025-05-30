@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1748265561 "main.aux" "main.bbl" "main" 1748265567 0
+["bibtex main"] 1748597754 "main.aux" "main.bbl" "main" 1748597918 0
   "./reference.bib" 1748225791 5813 5496448fe464734d9acf3c5004194183 ""
   "c:/texlive/2023/texmf-dist/bibtex/bst/base/plain.bst" 1709296319 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1748265565 9576 81b522e6296797eec0cafaa2ebc10992 "pdflatex"
+  "main.aux" 1748597917 9858 6e1339029d4cd20a5cec79f78e45854d "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1748265561 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1748265567 0
+["pdflatex"] 1748597913 "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" "main.pdf" "main" 1748597918 0
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1709296399 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1709296629 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm0600.tfm" 1709296531 1536 12e8c510d3e158fdd0e9a42e75118bd9 ""
@@ -58,6 +58,7 @@
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb" 1709296219 32007 e8fa0078355f39467039935974716569 ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb" 1709296219 32166 b0c356b15f19587482a9217ce1d8fa67 ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb" 1709296219 37912 07513ec114ac737ab54cea0152f4424b ""
+  "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb" 1709296219 37166 8ab3487cbe3ab49ebce74c29ea2418db ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb" 1709296219 36281 c355509802a035cadc5f15869451dcee ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1709296219 35752 024fb6c41858982481f6968b5fc26508 ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb" 1709296219 32722 d7379af29a190c3f453aba36302ff5a9 ""
@@ -66,7 +67,6 @@
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1709296219 32762 7fee39e011c23b3589931effd97b9702 ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb" 1709296219 32726 39f0f9e62e84beb801509898a605dbd5 ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb" 1709296219 33993 9b89b85fd2d9df0482bd47194d1d3bf3 ""
-  "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb" 1709296219 32587 65067f817f408bc71a7312f3d9828a9b ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1709296219 32716 08e384dc442464e7285e891af9f45947 ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb" 1709296219 36607 d654cb3f2bc54f57509240071db3bffa ""
   "c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb" 1709296219 35660 fb24af7afbadb71801619f1415838111 ""
@@ -228,21 +228,21 @@
   "c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1709297760 4662804 27f73c2f767ae4579fe38abe9088e726 ""
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1709297927 7883442 5f66b8dca6fb943244df223f16609769 ""
   "c:/texlive/2023/texmf.cnf" 1709297744 713 e69b156964470283e0530f5060668171 ""
-  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1748265563 22249 995755ab86cf9079c8ce1166f06037b1 ""
+  "d:/Bertram Rowen/texts/code/CS177/CS177_pj/src/paper/latex/main.tex" 1748597912 25852 5735adea4c8322ce6430874bc30ebf1b ""
+  "images/7fold_result.png" 1748585429 278492 92e76d6da80ddbe82b5bebd9416fd006 ""
   "images/CNN.png" 1746622087 309923 19cc4d6734546d8388879aa3d7951313 ""
   "images/gap_histogram.png" 1748227750 251794 a7f5602e76ea1fb8136207267a8ae891 ""
   "images/gap_violinplot.png" 1748227751 254604 293acd4ae174f1c0336ac0f89600d8f6 ""
-  "images/normal_converge.png" 1747482164 163862 3792a273763f619df6ebbc1f5cd58096 ""
   "images/one_hot.png" 1746618490 269494 13a9478612076a466c9799a527d5843b ""
   "images/origin_param.png" 1746494326 216773 f1bc5d7b8e26af14c16a48a7965a591a ""
   "images/reproduction_metrics_comparison_seaborn.png" 1748260227 93797 55c5ab95fe1fb1a6711af139f79b3081 ""
   "images/reproduction_residuals_seaborn.png" 1748260242 105047 48d44ebc4f15755c12acdb842cdfca3c ""
   "images/reproduction_scatter_seaborn.png" 1748260237 444723 d4c03dbd2f3bf7881119b3507615a9ad ""
   "images/top20_heatmap.png" 1748261305 351003 947b5f8d2b88fa8d881f839536ff30d9 ""
-  "main.aux" 1748265565 9576 81b522e6296797eec0cafaa2ebc10992 "pdflatex"
-  "main.bbl" 1748265561 1279 efc902309cb24225102f6fd9d5ac0403 "bibtex main"
-  "main.out" 1748265565 4329 c315b59d1cd1cf637c4f2a9c7bceaad1 "pdflatex"
-  "main.tex" 1748265563 22249 995755ab86cf9079c8ce1166f06037b1 ""
+  "main.aux" 1748597917 9858 6e1339029d4cd20a5cec79f78e45854d "pdflatex"
+  "main.bbl" 1748597754 1279 efc902309cb24225102f6fd9d5ac0403 "bibtex main"
+  "main.out" 1748597917 4940 0e7586714676650740ec093a0941ceca "pdflatex"
+  "main.tex" 1748597912 25852 5735adea4c8322ce6430874bc30ebf1b ""
   (generated)
   "main.aux"
   "main.log"

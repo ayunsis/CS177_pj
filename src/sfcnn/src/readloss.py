@@ -19,7 +19,7 @@ def load_cv_results():
             print("Cross-validation summary not found. Make sure to run training with cross-validation first.")
             return None
 
-def plot_fold_metrics(fold_num, k_folds=10):
+def plot_fold_metrics(fold_num, k_folds=7):
     """Plot metrics for a specific fold"""
     # Try new structure first
     fold_dir = f'src/sfcnn/src/train_results/cv_results/fold_{fold_num}/metrics'
@@ -71,7 +71,7 @@ def plot_fold_metrics(fold_num, k_folds=10):
     plt.tight_layout()
     plt.show()
 
-def plot_cv_summary(k_folds=10):
+def plot_cv_summary(k_folds=7):
     """Plot cross-validation summary across all folds"""
     cv_summary = load_cv_results()
     if cv_summary is None:
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     parser.add_argument('--mode', choices=['fold', 'summary', 'legacy', 'list'], default='summary',
                        help='Visualization mode: fold (specific fold), summary (CV summary), legacy (old format), list (show available folds)')
     parser.add_argument('--fold', type=int, default=1, help='Fold number to visualize (for fold mode)')
-    parser.add_argument('--k_folds', type=int, default=10, help='Number of folds used in cross-validation')
+    parser.add_argument('--k_folds', type=int, default=7, help='Number of folds used in cross-validation')
     args = parser.parse_args()
 
     if args.mode == 'list':
