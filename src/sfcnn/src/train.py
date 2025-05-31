@@ -151,7 +151,7 @@ if __name__ == '__main__':
     fold_results = []
     best_overall_loss = float('inf')
     best_fold = -1
-    TRAIN_EPOCHS = 2
+    TRAIN_EPOCHS = 150
     SAVE_EPOCHS = 0
     from torch.cuda.amp import autocast, GradScaler
     for fold, (train_ids, val_ids) in enumerate(kfold.split(all_train_idx)):        

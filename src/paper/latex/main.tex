@@ -381,16 +381,18 @@ can be attributed to several methodological limitations and training dataset con
 
 AF3's Diffusion Transformer architecture lacks explicit physics-based energy 
 calculations, resulting in minimal correlation between ranking metrics 
-and experimental binding affinities. While AF3 excels at predicting 
-static protein-ligand interactions with minimal conformational changes 
-and outperforms traditional docking in side-chain orientation accuracy, it 
-struggles with complexes involving significant conformational changes 
-($>$ 5Å RMSD). This positions AF3 as a "true-hit binary interaction modeler" 
-suitable for generating structural models of experimentally validated binding pairs, 
-rather than for de novo affinity prediction. The model's limited ability 
-to differentiate across the kinome highlights the need for integration 
-with physics-based scoring methods.
+and experimental binding affinities. Unlike physics-based methods that 
+explicitly model electrostatic interactions, van der Waals forces, and 
+solvation effects, AF3's learned representations may fail to capture 
+subtle energetic differences that distinguish strong from weak binders.
 
+AF3's confidence scores, which correlate with structural accuracy rather than binding strength, 
+further compound this limitation by providing misleading assessments of 
+prediction quality for affinity-related tasks. Additionally, the model's 
+single-shot prediction approach cannot account for the ensemble of 
+conformational states that contribute to experimental binding affinities, 
+particularly for flexible protein-ligand systems where induced-fit mechanisms 
+play crucial roles.
 
 \paragraph{\textbf{Training Data Constraints and Generalization Deficiencies}}
 
