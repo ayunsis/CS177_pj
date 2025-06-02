@@ -1,8 +1,15 @@
 # Assessing AlphaFold3 Predictions for Protein-Ligand Affinity via Sfcnn
 
+
 ## Overview
 
 This project systematically evaluates the reliability of AlphaFold3 (AF3)-predicted protein structures for protein-ligand affinity (PLA) prediction tasks. The study reproduces the Sfcnn model, a 3D convolutional neural network (CNN) for PLA prediction, using PyTorch and assesses AF3-derived protein structures compared to experimentally determined structures.
+
+## Data Source
+Due to the size of the training data, it is not included in the final submission,
+please download it from **https://send.deemos.com/download/1366587fe3487d8f/#5gbM8FXKbGhDo00b9PZrrQ** through code: **MeX83f**.
+
+**Please make sure file storage follows the project tree below.** 
 
 ## Project Structure
 
@@ -52,23 +59,25 @@ CS177_pj/
 
 The core implementation reproduces the Sfcnn neural network for protein-ligand affinity prediction:
 
-- **Featurization**: Atomic features encoded as one-hot vectors
-- **Grid Generation**: 3D spatial grids centered on ligand binding site
-- **Data Augmentation**: Random rotations (10 variants per complex)
-- **Storage**: HDF5 format for efficient large-scale data handling
-- **Architecture**: 3D CNN with multiple convolutional layers, batch normalization, and dropout
-- **Input**: 3D grids (20×20×20) with 28-channel one-hot encoding for atom types
-- **Output**: Predicted binding affinity (pKa values)
-- **Training**: 7-fold cross-validation on PDBbind v2019 refined set
-- **Evaluation**: CASF-2016 core set (285 protein-ligand complexes)
+- **data.py**: Used to generate the h5 training/testing data, notice the output is about 40.1 GiB
+- **train.py**: Main training file, run directly to initiate K-fold training, results will be stored in `src/sfcnn/src/train_results`
+- **readloss.py**: Visualization of the training process, please
+run it after the training process
+- **predict.py**: Middleware used for model loading and prediction,
+which can also be runned for single protein prediction
+- **eval_casf2016.py**: Visualization and metrics comparision for 
+model performance on casf2016 test set
+
 
 ### 2. AlphaFold3 Evaluation (`src/AF3_eval/`)
 
 Systematic assessment of AF3-predicted structures:
 
-- **Comparison**: AF3 structures vs. experimentally determined structures
-- **Metrics**: Pearson correlation, RMSE, MAE, and SD
-- **Analysis**: Structure quality impact on binding affinity prediction
+- **utils**: Intermidiate tools for .cif extraction etc
+- **data.py**: Used to generate the h5 testing data, directly with .cif
+- **predict.py**: Exact middleware in sfcnn
+- **eval.py**: Result metrics generation using AF3 predicted structures
+- **parse.py**: Final result visualization and metrics comparision
 
 
 ## Requirements
@@ -133,10 +142,5 @@ python src/sfcnn/src/readloss.py --mode summary  # Cross-validation summary
 python src/sfcnn/src/readloss.py --mode fold --fold 1  # Specific fold results
 ```
 
-## Data Sources
 
-- **Training**: PDBbind v2019 refined set (4,852 unique complexes after overlap removal)
-- **Testing**: CASF-2016 core set (285 complexes, 279 after exclusions)
-- **AF3 Structures**: Generated using AlphaFold3 server
-- **Experimental Structures**: From Protein Data Bank (PDB)
 

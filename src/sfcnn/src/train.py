@@ -292,7 +292,7 @@ if __name__ == '__main__':
 
                 val_metrics_history.append([epoch, pearson, rmse, mae, sd])
 
-                # Test evaluation in training loop
+                
                 test_preds = []
                 test_targets = []
                 test_loss = 0
@@ -350,7 +350,7 @@ if __name__ == '__main__':
                     torch.save(model.state_dict(), f'src/sfcnn/src/train_results/cnnmodel/best_overall_weights.pt')
                     torch.save(model.state_dict(), f'{fold_model_dir}/overall_best_weights.pt')
 
-        # Remove the separate test evaluation block and update metrics saving
+
         np.save(f'{fold_metrics_dir}/train_metrics_history.npy', np.array(train_metrics_history))
         np.save(f'{fold_metrics_dir}/val_metrics_history.npy', np.array(val_metrics_history))
         np.save(f'{fold_metrics_dir}/test_metrics_history.npy', np.array(test_metrics_history))
@@ -358,7 +358,7 @@ if __name__ == '__main__':
         
         torch.save(model.state_dict(), f'{fold_model_dir}/final_weights_epoch{TRAIN_EPOCHS}.pt')
         
-        # Update fold summary with final test metrics
+
         final_test_metrics = test_metrics_history[-1] if test_metrics_history else [0, 0, 0, 0, 0]
         fold_summary = {
             'fold': fold + 1,

@@ -193,7 +193,7 @@ def list_available_folds():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Visualize training results')
-    parser.add_argument('--mode', choices=['fold', 'summary', 'legacy', 'list'], default='summary',
+    parser.add_argument('--mode', choices=['fold', 'summary', 'list'], default='summary',
                        help='Visualization mode: fold (specific fold), summary (CV summary), legacy (old format), list (show available folds)')
     parser.add_argument('--fold', type=int, default=1, help='Fold number to visualize (for fold mode)')
     parser.add_argument('--k_folds', type=int, default=7, help='Number of folds used in cross-validation')
@@ -201,49 +201,6 @@ if __name__ == "__main__":
 
     if args.mode == 'list':
         available_folds = list_available_folds()
-        if available_folds > 0:
-            print(f"\nUse --mode fold --fold N to view specific fold results")
-            print(f"Use --mode summary to view cross-validation summary")
-    
-    elif args.mode == 'legacy':
-        try:
-            train_metrics = np.load('src/sfcnn/src/train_results/train_metrics_history.npy')
-            val_metrics = np.load('src/sfcnn/src/train_results/val_metrics_history.npy')
-
-            max_len = max(train_metrics.shape[0], val_metrics.shape[0])
-            tm = np.zeros((max_len, train_metrics.shape[1]))
-            vm = np.zeros((max_len, val_metrics.shape[1]))
-
-            tm[:train_metrics.shape[0], :] = train_metrics
-            vm[:val_metrics.shape[0], :] = val_metrics
-
-            train_metrics = tm
-            val_metrics = vm
-
-            epochs = train_metrics[:, 0]
-            metrics_names = ['Pearson', 'RMSE', 'MAE', 'SD']
-            colors = ['#1f77b4', '#ff7f0e']
-
-            sns.set_style("whitegrid")
-            plt.figure(figsize=(12, 8))
-
-            for i, name in enumerate(metrics_names, 1):
-                plt.subplot(2, 2, i)
-                plt.plot(epochs, train_metrics[:, i], label='Train', color=colors[0], linewidth=2)
-                plt.plot(epochs, val_metrics[:, i], label='Val', color=colors[1], linewidth=2)
-                plt.title(name)
-                plt.xlabel('Epoch')
-                plt.ylabel(name)
-                plt.legend(frameon=True)
-                plt.grid(alpha=0.7)
-                plt.xlim(0, max(epochs))
-                if name == 'Pearson':
-                    plt.ylim(0, 1)
-
-            plt.tight_layout()
-            plt.show()
-        except FileNotFoundError:
-            print("Legacy metrics files not found. Use --mode summary or --mode fold instead.")
     
     elif args.mode == 'fold':
         plot_fold_metrics(args.fold, args.k_folds)
