@@ -276,12 +276,12 @@ in Section~\ref{sec:ReproducedResults}.
 \label{tab:af3_metrics}
 \begin{tabular}{lcc}
 \toprule
-Metric & vs. CASF2016 Sfcnn & vs. Groundtruth \\
+Metric & vs. Groundtruth & vs.  CASF2016 Sfcnn\\
 \midrule
-Pearson $R$ & 0.2930 & 0.3850 \\
-RMSE        & 2.0836 & 1.1669 \\
-MAE         & 1.6933 & 0.9231 \\
-SD          & 2.0825 & 1.0970 \\
+Pearson $R$ & 0.2930 & 0.3620 \\
+RMSE        & 2.0836 & 1.2543 \\
+MAE         & 1.6933 & 0.9962 \\
+SD          & 2.0825 & 1.1761 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -436,38 +436,6 @@ physics-based scoring functions with structure prediction models and incorporati
 conformational information to enhance reliability for drug discovery applications.
 
 
-\section{Author Contributions}
-
-\subsection{Guo Yu}
-\begin{itemize}
-    \item Designed and implemented the data pipeline, including dataset curation, preprocessing, featurization, data augmentation, and storage.
-    \item Managed exclusion of overlapping complexes and ensured data compatibility with the reproduced network.
-    \item Designed and maintained the AF3 generation-evaluation workflow, implemented K-fold cross-validation.
-\end{itemize}
-
-\subsection{Yiming Wu}
-\begin{itemize}
-    \item Implemented and reproduced the Sfcnn neural network architecture in PyTorch, adapting the original TensorFlow design.
-    \item Designed and executed evaluation process for both experimentally determined and AF3-predicted structures.
-\end{itemize}
-
-\subsection{Yiyang Tan}
-\begin{itemize}
-    \item Conducted comparative studies and error analysis of model outputs, calculated evaluation metrics (RMSE, MAE, SD, Pearson $R$).
-    \item Generated all analysis visualizations, such as heatmaps, histograms, etc.
-\end{itemize}
-
-\subsection{All Authors}
-\begin{itemize}
-    \item Contributed to the training process and hyperparameter tuning.
-    \item Participated in the AF3 result generation.
-    \item Participated in the interpretation of results and manuscript writing.
-    \item Provided critical review of the paper and process.
-\end{itemize}  
-
-The project was conducted collaboratively with regular 
-discussions to refine methodology and analysis.
-
 \section{External Libraries}
 
 \begin{itemize}
@@ -482,12 +450,34 @@ discussions to refine methodology and analysis.
     \item \textbf{tqdm}: Displaying progress bars for iterative processes like training epochs and data loading.
 \end{itemize}
 
-\section{Acknowledgments}
-This work was completed as the final project for the CS177: Bioinformatics—Software Development 
-and Applications course at ShanghaiTech University. 
-The authors thank the course instructors and teaching assistants 
-for their guidance and support throughout the project.
+\section{Personal Reflections: Guo Yu}
 
+\subsection{Contributions}
+\begin{itemize}
+    \item Designed and implemented the data pipeline, including dataset curation, preprocessing, featurization, data augmentation, and storage.
+    \item Managed exclusion of overlapping complexes and ensured data compatibility with the reproduced network.
+    \item Designed and maintained the AF3 generation-evaluation workflow, implemented K-fold cross-validation.
+\end{itemize}
+\subsection{Problems Encountered}
+\begin{itemize}
+    \item Extremely large memory consumption issues arose with the original data storage and retrieval methods, leading to the adoption of HDF5 format for efficient handling of large datasets.
+    \item K-fold cross-validation required extensive training time, necessitating experimentation with optimization techniques such as learning rate scheduling and mixed precision training to balance computational efficiency with model performance.
+\end{itemize}
+
+
+\section{Acknowledgments}
+This work was completed as the final project for CS177: Bioinformatics—Software Development 
+and Applications at ShanghaiTech University. 
+The authors express their gratitude to the course instructors and teaching assistants 
+for their valuable guidance and support throughout this project.
+
+We acknowledge the assistance of GitHub Copilot, an AI-powered programming assistant, 
+which provided support in several key areas of this research:
+\begin{itemize}
+    \item Hyperparameter optimization recommendations for the Sfcnn training process
+    \item Technical insights into AlphaFold3's diffusion model architecture
+    \item Insights in visualization techniques for model performance metrics
+\end{itemize}
 
 \bibliographystyle{plain}
 \bibliography{reference}
