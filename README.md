@@ -7,7 +7,7 @@ This project systematically evaluates the reliability of AlphaFold3 (AF3)-predic
 
 ## Data Source
 Due to the size of the training data, it is not included in the final submission,
-please download it from **https://send.deemos.com/download/1366587fe3487d8f/#5gbM8FXKbGhDo00b9PZrrQ** through code: **MeX83f**.
+please download it from **https://send.deemos.com/download/d9f9dabbfe31319d/#AgG7mUgd3kPtOyl4TR4Xvw** through code: **m9QsPj**.
 
 **Please make sure file storage follows the project tree below.** 
 
