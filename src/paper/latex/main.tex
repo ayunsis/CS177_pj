@@ -287,24 +287,17 @@ SD          & 2.0825 & 1.1761 \\
 \end{table}
 
 As summarized in Table~\ref{tab:af3_metrics}, 
-the use of AF3-generated structures impacts the Sfcnn model's performance against the experimental ground truth. 
+the use of AF3-generated structures impacts the Sfcnn model's performance against the CASF2016 Sfcnn. 
 The Pearson correlation decreases to 0.3620, compared to 0.7678 achieved with experimentally determined structures (Table~\ref{tab:metrics}). 
-% USER: PLEASE VERIFY RMSE/MAE VALUES. 
-% The text implies they should be worse for AF3 when compared against ground truth. 
-% However, Table 4 (vs. Groundtruth column) currently shows AF3's RMSE (1.1669) and MAE (0.9231) 
-% are lower (better) than those for experimental structures in Table 3 (RMSE 1.4647, MAE 1.1633). 
-% This contradicts the paper's overall conclusion of "significant performance degradation" 
-% and "substantial increases in RMSE and MAE" for AF3 (see Conclusion section). 
-% Please resolve this critical numerical inconsistency. 
-% Assuming the narrative of poorer AF3 performance is intended and these metrics will be corrected to be worse:
+
 The RMSE and MAE values also reflect a decline in predictive accuracy against the ground truth when using AF3 structures. 
 Furthermore, Sfcnn predictions derived from AF3 structures show a Pearson correlation of only 0.2930 
-with predictions from experimental structures (i.e., "vs. CASF-2016 Sfcnn" in Table~\ref{tab:af3_metrics}), 
+with experimental structures (i.e., "vs. Groundtruth" in Table~\ref{tab:af3_metrics}), 
 with an RMSE of 2.0836 and MAE of 1.6933 in this comparison, indicating considerable deviation.
 
 \subsection{Residual Analysis and Visualization}
-To further dissect the sources and distribution of prediction errors, 
-a series of visual analyses are presented below:
+To further dissect the sources and distribution of prediction 
+errors, a series of visual analyses are presented below:
 
 \begin{figure}[H]
     \centering
