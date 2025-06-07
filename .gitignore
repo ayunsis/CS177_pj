@@ -11,3 +11,4 @@ data
 *.pt
 *.npy
 src/sfcnn/outputs
+src/paper/reflection

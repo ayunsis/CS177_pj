@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.3.1)  6 JUN 2025 22:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.3.1)  7 JUN 2025 14:28
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -787,7 +787,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 77--77
 $[]$ [][][]$\OT1/cmtt/m/n/8 https : / / bmcbioinformatics . biomedcentral . com / articles /
  []
 
-<images/one_hot.png, id=133, 840.13875pt x 351.56343pt>
+<images/one_hot.png, id=141, 840.13875pt x 351.56343pt>
 File: images/one_hot.png Graphic file (type png)
 <use images/one_hot.png>
 Package pdftex.def Info: images/one_hot.png  used on input line 81.
@@ -823,7 +823,7 @@ Underfull \hbox (badness 1221) in paragraph at lines 89--90
 \OT1/cmr/m/n/7.52812 depicted in Figure []2[], combined with the aforementioned
  []
 
-<images/CNN.png, id=167, 528.47438pt x 660.21657pt>
+<images/CNN.png, id=175, 528.47438pt x 660.21657pt>
 File: images/CNN.png Graphic file (type png)
 <use images/CNN.png>
 Package pdftex.def Info: images/CNN.png  used on input line 93.
@@ -882,12 +882,12 @@ Underfull \hbox (badness 2495) in paragraph at lines 174--177
 \OT1/cmr/m/n/7.52812 correlation of $0\OML/cmm/m/it/7.52812 :\OT1/cmr/m/n/7.52812 7375 \OMS/cmsy/m/n/7.52812 ^^F \OT1/cmr/m/n/7.52812 0\OML/cmm/m/it/7.52812 :\OT1/cmr/m/n/7.52812 0145$ and the highest Pearson
  []
 
-<images/reproduction_metrics_comparison_seaborn.png, id=186, 578.16pt x 361.35pt>
+<images/reproduction_metrics_comparison_seaborn.png, id=194, 578.16pt x 361.35pt>
 File: images/reproduction_metrics_comparison_seaborn.png Graphic file (type png)
 <use images/reproduction_metrics_comparison_seaborn.png>
 Package pdftex.def Info: images/reproduction_metrics_comparison_seaborn.png  used on input line 183.
 (pdftex.def)             Requested size: 195.39702pt x 122.11853pt.
-<images/reproduction_scatter_seaborn.png, id=187, 505.89pt x 505.89pt>
+<images/reproduction_scatter_seaborn.png, id=195, 505.89pt x 505.89pt>
 File: images/reproduction_scatter_seaborn.png Graphic file (type png)
 <use images/reproduction_scatter_seaborn.png>
 Package pdftex.def Info: images/reproduction_scatter_seaborn.png  used on input line 189.
@@ -902,7 +902,7 @@ Underfull \hbox (badness 1365) in paragraph at lines 194--196
 \OT1/cmr/m/n/7.52812 training process \OT1/cmr/bx/n/7.52812 did not converge \OT1/cmr/m/n/7.52812 during reproduction;
  []
 
-<images/7fold_result.png, id=192, 867.24pt x 578.16pt>
+<images/7fold_result.png, id=200, 867.24pt x 578.16pt>
 File: images/7fold_result.png Graphic file (type png)
 <use images/7fold_result.png>
 Package pdftex.def Info: images/7fold_result.png  used on input line 200.
@@ -912,7 +912,7 @@ Overfull \hbox (9.0pt too wide) in paragraph at lines 200--201
  [][] 
  []
 
-<images/origin_param.png, id=193, 867.24pt x 578.16pt>
+<images/origin_param.png, id=201, 867.24pt x 578.16pt>
 File: images/origin_param.png Graphic file (type png)
 <use images/origin_param.png>
 Package pdftex.def Info: images/origin_param.png  used on input line 206.
@@ -927,7 +927,7 @@ Underfull \hbox (badness 2073) in paragraph at lines 210--213
 \OT1/cmr/m/n/7.52812 true values) are visualized in Figure []7[]. The histogram
  []
 
-<images/reproduction_residuals_seaborn.png, id=195, 578.16pt x 361.35pt>
+<images/reproduction_residuals_seaborn.png, id=203, 578.16pt x 361.35pt>
 File: images/reproduction_residuals_seaborn.png Graphic file (type png)
 <use images/reproduction_residuals_seaborn.png>
 Package pdftex.def Info: images/reproduction_residuals_seaborn.png  used on input line 216.
@@ -958,12 +958,12 @@ Underfull \hbox (badness 7981) in paragraph at lines 263--272
 \OT1/cmr/m/n/7.52812 To quantitatively assess the reliability of AlphaFold3
  []
 
-<images/top20_heatmap.png, id=220, 795.9336pt x 578.16pt>
+<images/top20_heatmap.png, id=228, 795.9336pt x 578.16pt>
 File: images/top20_heatmap.png Graphic file (type png)
 <use images/top20_heatmap.png>
 Package pdftex.def Info: images/top20_heatmap.png  used on input line 304.
 (pdftex.def)             Requested size: 219.8235pt x 159.67819pt.
-<images/gap_histogram.png, id=221, 867.24pt x 505.89pt>
+<images/gap_histogram.png, id=229, 867.24pt x 505.89pt>
 File: images/gap_histogram.png Graphic file (type png)
 <use images/gap_histogram.png>
 Package pdftex.def Info: images/gap_histogram.png  used on input line 305.
@@ -990,7 +990,7 @@ Overfull \vbox (1.0pt too high) has occurred while \output is active []
 Non-PDF special ignored!
 <special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
  <./images/top20_heatmap.png> <./images/gap_histogram.png>]
-<images/gap_violinplot.png, id=235, 722.7pt x 505.89pt>
+<images/gap_violinplot.png, id=243, 722.7pt x 505.89pt>
 File: images/gap_violinplot.png Graphic file (type png)
 <use images/gap_violinplot.png>
 Package pdftex.def Info: images/gap_violinplot.png  used on input line 318.
@@ -1146,17 +1146,27 @@ Underfull \hbox (badness 6204) in paragraph at lines 450--451
  []
 
 
-Underfull \hbox (badness 1584) in paragraph at lines 457--458
-\OT1/cmr/m/n/7.52812 such as learning rate scheduling and mixed precision
+Underfull \hbox (badness 2435) in paragraph at lines 452--453
+[]\OT1/cmr/m/n/7.52812 Designed and maintained the entire AF3 generation-
  []
 
 
-Underfull \hbox (badness 1874) in paragraph at lines 470--471
+Underfull \hbox (badness 5359) in paragraph at lines 458--459
+[]\OT1/cmr/m/n/7.52812 Designed and executed evaluation process for both
+ []
+
+
+Underfull \hbox (badness 3343) in paragraph at lines 475--477
+[]\OT1/cmr/m/n/7.52812 The project was conducted collaboratively with regular
+ []
+
+
+Underfull \hbox (badness 1874) in paragraph at lines 488--489
 []\OT1/cmr/m/n/7.52812 Hyperparameter optimization recommendations for the
  []
 
 
-Underfull \hbox (badness 5091) in paragraph at lines 471--472
+Underfull \hbox (badness 5091) in paragraph at lines 489--490
 []\OT1/cmr/m/n/7.52812 Technical insights into AlphaFold3's diffusion model
  []
 
@@ -1166,48 +1176,72 @@ Underfull \hbox (badness 1365) in paragraph at lines 24--27
  []
 
 )
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
-[leftcolumn badness]: 1000000 on 48.96379pt
-[rightcolumn badness]: 1000000 on 48.96379pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
+[leftcolumn badness]: 1000000 on 46.92758pt
+[rightcolumn badness]: 1000000 on 46.92758pt
 - LAST -
-Extra skip:32.0pt
-Left:526.5pt/1.46379pt
-Right:494.5pt/1.46379pt
-Split: 526.75pt
-Output:526.75pt
+Extra skip:55.45444pt
+Left:614.5pt/1.88202pt
+Right:559.46379pt/1.46379pt
+Split: 615.23189pt
+Output:615.23189pt
 Pageshrink: 0.0pt
-Pagestretch: 3.0pt
+Pagestretch: 6.0pt
 @colht:671.5pt
-FLUSHEND [output]: 526.75pt
+FLUSHEND [output]: 615.23189pt
 FLUSHEND [leftcolumn badness]: 0
 FUSHEND [rightcolumn badness]: 10000
 
@@ -1220,21 +1254,21 @@ Non-PDF special ignored!
 <special> ps: [{ThisPage} << /CropBox [0 0 595.26013 782.33696] >> /PUT pdf...
 ] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 6E0934E12EDC79D88061C1A0644F36C5;4956.
+(rerunfilecheck)             Checksum: D90CC6DE5F0252AAF315C3C40DBA09BB;5050.
  ) 
 Here is how much of TeX's memory you used:
- 25739 strings out of 476025
- 477497 string characters out of 5794016
- 1883382 words of memory out of 5000000
- 45644 multiletter control sequences out of 15000+600000
+ 25743 strings out of 476025
+ 477557 string characters out of 5794016
+ 1889382 words of memory out of 5000000
+ 45646 multiletter control sequences out of 15000+600000
  542798 words of font info for 152 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
  99i,13n,94p,17429b,473s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmb10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb>
-Output written on main.pdf (6 pages, 2362923 bytes).
+Output written on main.pdf (6 pages, 2363142 bytes).
 PDF statistics:
- 360 PDF objects out of 1000 (max. 8388607)
- 285 compressed objects within 3 object streams
- 66 named destinations out of 1000 (max. 500000)
- 303 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 369 PDF objects out of 1000 (max. 8388607)
+ 294 compressed objects within 3 object streams
+ 68 named destinations out of 1000 (max. 500000)
+ 319 words of extra memory for PDF output out of 10000 (max. 10000000)
 

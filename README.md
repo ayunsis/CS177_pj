@@ -61,6 +61,7 @@ The core implementation reproduces the Sfcnn neural network for protein-ligand a
 
 - **data.py**: Used to generate the h5 training/testing data, notice the output is about 40.1 GiB
 - **train.py**: Main training file, run directly to initiate K-fold training, results will be stored in `src/sfcnn/src/train_results`
+(certain valuable models and train process are saved and ready )
 - **readloss.py**: Visualization of the training process, please
 run it after the training process
 - **predict.py**: Middleware used for model loading and prediction,
